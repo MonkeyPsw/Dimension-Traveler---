@@ -11,7 +11,7 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-
+        
     }
 
     void Update()
@@ -31,7 +31,8 @@ public class GameManager : MonoBehaviour
 
     public void SetDimension()
     {
-        CameraMove.setDimension();
+        CameraMove.ChangeDimension();
+        PlayerMovement.isChange = true;
         inputEnabled = false; // 입력 비활성화
         StartCoroutine(EnableInputAfterDelay(inputDelay)); // 입력 딜레이 후에 다시 활성화
     }

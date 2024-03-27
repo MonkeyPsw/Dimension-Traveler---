@@ -13,6 +13,10 @@ public class PlayerMovement : MonoBehaviour
     public static bool isGrounded; // 땅에 닿았는지 여부
     
     public int hp = 10;
+    Coroutine reduceHp;
+    bool isReduce = false;
+    public float dimensionGauge = 10.0f;
+    public static bool isChange = false;
 
     bool is2D = false;
     public Vector3 wallPos;
@@ -38,11 +42,21 @@ public class PlayerMovement : MonoBehaviour
     {
         float moveHorizontal = Input.GetAxisRaw("Horizontal");
         float moveVertical = Input.GetAxisRaw("Vertical");
-        
+
+        if (hp <= 0)
+        {
+            hp = 0;
+            Debug.Log("게임종료");
+            return;
+        }
+
         // 연속으로 차원 전환하는게 좀 이상한데 몰루
-        if (CameraMove.mainCam.orthographic) // 3D에서 2D로 갈때
+        if (CameraMove.mainCam.orthographic) // 2D일때, 3D에서 2D로 갈때
         {
             Debug.Log("if문 3D에서 2D로");
+
+            if (isChange)
+                StartCoroutine(DimensionGaugeChange(2.0f));
 
             isWallCenter = false;
 
@@ -53,9 +67,12 @@ public class PlayerMovement : MonoBehaviour
             // Orthographic 2D일 때는 좌우키로 z축 이동
             movement = new Vector3(0f, 0f, moveHorizontal).normalized;
         }
-        else // 2D에서 3D로 갈때
+        else // 3D일때, 2D에서 3D로 갈때
         {
             Debug.Log("else문 2D에서 3D로");
+
+            if (isChange)
+                StartCoroutine(DimensionGaugeChange(2.0f));
 
             is2D = true;
 
@@ -74,15 +91,119 @@ public class PlayerMovement : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Space) && isGrounded && GameManager.inputEnabled)
         {
-            Jump();
+            Jump(jumpForce);
         }
+
+        if (isReduce)
+        {
+            reduceHp = StartCoroutine(ReduceHp(1.0f));
+        }
+
+        if (CameraMove.mainCam.orthographic && reduceHp != null)
+        {
+            Debug.Log("HP감소멈춰");
+            StopCoroutine(reduceHp);
+            reduceHp = null;
+        }
+
     }
 
     void FixedUpdate()
     {
-        
 
+    }
 
+    //IEnumerator DimensionGaugeChange(float delay)
+    //{
+    //    isChange = false;
+    //    Debug.Log("차원 전환 게이지 변화중");
+
+    //    if (CameraMove.mainCam.orthographic)
+    //    {
+    //        yield return new WaitForSecondsRealtime(delay);
+    //        if (dimensionGauge < 10.0f)
+    //        {
+    //            dimensionGauge += Time.fixedDeltaTime;
+    //            //dimensionGauge = Mathf.Min(dimensionGauge, 10.0f);
+    //        }
+    //        if (dimensionGauge >= 10.0f)
+    //            dimensionGauge = 10.0f;
+    //    }
+    //    else
+    //    {
+    //        yield return new WaitForSecondsRealtime(delay);
+    //        if (dimensionGauge > 0)
+    //        {
+    //            dimensionGauge -= Time.fixedDeltaTime;
+    //            //dimensionGauge = Mathf.Max(dimensionGauge, 0.0f);
+    //        }
+    //        if (dimensionGauge <= 0)
+    //            dimensionGauge = 0;
+
+    //    }
+    //}
+
+    IEnumerator DimensionGaugeChange(float delay)
+    {
+        isChange = false;
+        Debug.Log("차원 전환 게이지 변화중");
+
+        yield return new WaitForSecondsRealtime(delay); // 딜레이 만큼 대기
+
+        if (CameraMove.mainCam.orthographic)
+        {
+            //if (reduceHp != null)
+            //{
+            //    StopCoroutine(reduceHp);
+            //}
+
+            while (true)
+            {
+                yield return null;
+                dimensionGauge += Time.fixedDeltaTime;
+                Debug.Log("차원 전환 게이지 증가중");
+
+                if (!CameraMove.mainCam.orthographic)
+                    break;
+
+                if (dimensionGauge >= 10.0f)
+                {
+                    dimensionGauge = 10.0f;
+                    break;
+                }
+            }
+        }
+        else
+        {
+            while (true)
+            {
+                yield return null;
+                dimensionGauge -= Time.fixedDeltaTime;
+                Debug.Log("차원 전환 게이지 감소중");
+
+                if (CameraMove.mainCam.orthographic)
+                    break;
+
+                if (dimensionGauge <= 0)
+                {
+                    dimensionGauge = 0;
+                    isReduce = true;
+                    break;
+                }
+            }
+        }
+
+    }
+
+    IEnumerator ReduceHp(float delay)
+    {
+        isReduce = false;
+        while (true)
+        {
+            yield return new WaitForSecondsRealtime(delay);
+            Debug.Log("HP 감소");
+            hp--;
+        }
     }
 
     IEnumerator MoveToCenterWithDelay(float delay)
@@ -107,11 +228,11 @@ public class PlayerMovement : MonoBehaviour
         isWallCenter = true;
     }
 
-    public void Jump()
+    public void Jump(float force)
     {
         //transform.Translate(Vector3.up * jumpForce * Time.deltaTime);
         //rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
-        rb.velocity = Vector3.up * jumpForce;
+        rb.velocity = Vector3.up * force;
         //rb.velocity = new Vector3(0f, jumpForce, 0f);
         isGrounded = false;
     }
@@ -123,6 +244,11 @@ public class PlayerMovement : MonoBehaviour
             isGrounded = true;
         }
 
+        //if (collision.collider.CompareTag("MonsterHead"))
+        //{
+        //    Jump(jumpForce * 0.7f);
+        //    Destroy(collision.transform.parent.gameObject);
+        //}
     }
 
     private void OnCollisionStay(Collision collision)
@@ -146,6 +272,15 @@ public class PlayerMovement : MonoBehaviour
         {
             isGrounded = false;
         }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.CompareTag("Coin"))
+        {
+            Destroy(other.gameObject);
+        }
+
     }
 
 

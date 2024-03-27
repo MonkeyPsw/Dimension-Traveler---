@@ -59,13 +59,13 @@ public class CameraMove : MonoBehaviour
         transform.rotation = Quaternion.Slerp(transform.rotation, toRotation, camChangeSpeed * Time.deltaTime);
     }
 
-    public static void setDimension()
+    public static void ChangeDimension()
     {
         mainCam.orthographic = !mainCam.orthographic; // ≈‰±€
         
     }
 
-    public void setCamera2DPos()
+    public void SetCamera2DPos()
     {
         offset = new Vector3(10.0f, 0f, 0f);
 
@@ -75,7 +75,7 @@ public class CameraMove : MonoBehaviour
         transform.position = cameraNewPosition;
     }
 
-    public void setCamera3DPos()
+    public void SetCamera3DPos()
     {
         offset = new Vector3(0f, 0f, -4.0f);
 
