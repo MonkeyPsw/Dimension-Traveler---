@@ -88,7 +88,11 @@ public class CameraMove : MonoBehaviour
 
     Vector3 SetPosition()
     {
-        return mainCam.orthographic ? cam2DPos.position : cam3DPos.position;
+        //return mainCam.orthographic ? cam2DPos.position : cam3DPos.position;
+        Vector3 position = mainCam.orthographic ? cam2DPos.position : cam3DPos.position;
+        if (mainCam.orthographic)
+            position.y = -1.0f;
+        return position;
     }
 
     Quaternion SetRotation()

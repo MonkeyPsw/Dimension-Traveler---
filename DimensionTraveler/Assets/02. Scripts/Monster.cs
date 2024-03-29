@@ -4,8 +4,6 @@ using UnityEngine;
 
 public class Monster : MonoBehaviour
 {
-
-
     void Start()
     {
         
@@ -15,4 +13,6 @@ public class Monster : MonoBehaviour
     {
         
     }
+
+
 }
