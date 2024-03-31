@@ -179,7 +179,7 @@ public class PlayerMovement : MonoBehaviour
             while (true)
             {
                 yield return null;
-                curDimensionGauge += Time.fixedDeltaTime * 2;
+                curDimensionGauge += Time.deltaTime * 2;
                 Debug.Log("차원 전환 게이지 증가중");
 
                 if (!CameraMove.mainCam.orthographic)
@@ -197,7 +197,7 @@ public class PlayerMovement : MonoBehaviour
             while (true)
             {
                 yield return null;
-                curDimensionGauge -= Time.fixedDeltaTime;
+                curDimensionGauge -= Time.deltaTime;
                 Debug.Log("차원 전환 게이지 감소중");
 
                 if (CameraMove.mainCam.orthographic)
