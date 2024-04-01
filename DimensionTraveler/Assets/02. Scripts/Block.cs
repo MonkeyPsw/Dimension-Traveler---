@@ -48,6 +48,9 @@ public class Block : MonoBehaviour
 
             gameObject.GetComponentInParent<Renderer>().material = emptyMaterial;
             //gameObject.GetComponentInParent<Renderer>().material.SetTexture("_MainTex", emptyTexture);
+
+            //Debug.Log(collision.gameObject.name);
+            collision.gameObject.GetComponent<Rigidbody>().velocity = Vector3.down * 5.0f;
         }
     }
 

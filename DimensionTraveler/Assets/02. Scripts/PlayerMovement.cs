@@ -9,8 +9,10 @@ public class PlayerMovement : MonoBehaviour
     Vector3 movement;
     Rigidbody rb;
 
-    public float jumpForce = 15.0f; // 점프 힘
+    public float jumpForce = 8.0f; // 점프 힘
     public static bool isGrounded; // 땅에 닿았는지 여부
+    public float jumpMaxY = 3.0f;
+    public float jumpY = 0;
 
     public int curHp = 10;
     public int maxHp = 10;
@@ -23,8 +25,8 @@ public class PlayerMovement : MonoBehaviour
     public float preDimensionGauge = 10.0f;
     public static bool isChange = false;
 
-    public GameObject dimensionGaugeParent;
-    public GameObject dimensionGaugePrefab;
+    //public GameObject dimensionGaugeParent;
+    //public GameObject dimensionGaugePrefab;
     public Slider dimensionGaugeSlider;
 
     int score = 0;
@@ -49,11 +51,16 @@ public class PlayerMovement : MonoBehaviour
     {
         rb = GetComponent<Rigidbody>();
 
-        for (int i = 0; i < (int)maxDimensionGauge; i++)
-        {
-            GameObject gauge = Instantiate(dimensionGaugePrefab);
-            gauge.transform.parent = dimensionGaugeParent.transform;
-        }
+        //for (int i = 0; i < (int)maxDimensionGauge; i++)
+        //{
+        //    GameObject gauge = Instantiate(dimensionGaugePrefab);
+        //    gauge.transform.parent = dimensionGaugeParent.transform;
+        //}
+
+        curHpText = GameObject.Find("CurHP").GetComponent<TextMeshProUGUI>();
+        maxHpText = GameObject.Find("MaxHP").GetComponent<TextMeshProUGUI>();
+        dimensionGaugeSlider = GameObject.Find("DimensionGaugeSlider").GetComponent<Slider>();
+        scoreText = GameObject.Find("Score").GetComponent<TextMeshProUGUI>();
     }
 
     void Update()
@@ -67,6 +74,8 @@ public class PlayerMovement : MonoBehaviour
             Debug.Log("게임종료");
             //return;
         }
+        if (curHp > maxHp)
+            curHp = maxHp;
 
         // 연속으로 차원 전환하는게 좀 이상한데 몰루
         if (CameraMove.mainCam.orthographic) // 2D일때, 3D에서 2D로 갈때
@@ -105,11 +114,16 @@ public class PlayerMovement : MonoBehaviour
         {
             transform.Translate(movement * moveSpeed * Time.deltaTime);
             //rb.velocity = movement * moveSpeed;
-        }
+            // Translate를 쓰면 트리거 충돌이 2번씩 되고 velocity를 쓰면 이동이 끊기고 점프가 안되네
 
-        if (Input.GetKeyDown(KeyCode.Space) && isGrounded && GameManager.inputEnabled)
-        {
-            Jump(jumpForce);
+            if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
+            {
+                jumpY = transform.position.y;
+                Jump(jumpForce);
+            }
+
+            //if (transform.position.y > jumpMaxY + jumpY)
+            //    rb.velocity = Vector3.down * jumpForce;
         }
 
         if (isReduce)
@@ -130,10 +144,17 @@ public class PlayerMovement : MonoBehaviour
         scoreText.text = "SCORE : " + score;
     }
 
-    void FixedUpdate()
-    {
-
-    }
+    //void FixedUpdate()
+    //{
+    //    if (GameManager.inputEnabled)
+    //    {
+    //        rb.velocity = movement * moveSpeed;
+    //    }
+    //    else
+    //    {
+    //        rb.velocity = Vector3.zero;
+    //    }
+    //}
 
     //IEnumerator DimensionGaugeChange(float delay)
     //{
@@ -185,9 +206,9 @@ public class PlayerMovement : MonoBehaviour
                 if (!CameraMove.mainCam.orthographic)
                     break;
 
-                if (curDimensionGauge >= 10.0f)
+                if (curDimensionGauge >= maxDimensionGauge)
                 {
-                    curDimensionGauge = 10.0f;
+                    curDimensionGauge = maxDimensionGauge;
                     break;
                 }
             }
@@ -280,15 +301,30 @@ public class PlayerMovement : MonoBehaviour
     public void Jump(float force)
     {
         //transform.Translate(Vector3.up * jumpForce * Time.deltaTime);
+        //transform.Translate(0, jumpForce * Time.deltaTime, 0);
+        //if (transform.position.y > jumpMaxY + jumpY)
+        //    transform.Translate(0, -jumpForce * Time.deltaTime, 0);
+
         //rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
-        rb.velocity = Vector3.up * force;
         //rb.velocity = new Vector3(0f, jumpForce, 0f);
+        //rb.velocity = new Vector3(rb.velocity.x, force, rb.velocity.z);
+        rb.velocity = Vector3.up * force;
         isGrounded = false;
     }
 
     public void AddScore(int score)
     {
         this.score += score;
+    }
+
+    public void AddCurHp(int hp)
+    {
+        this.curHp += hp;
+    }
+
+    public void AddMaxHp(int hp)
+    {
+        this.maxHp += hp;
     }
 
     IEnumerator InputDelay(float delay)
@@ -320,8 +356,10 @@ public class PlayerMovement : MonoBehaviour
             isWallCenter = true;
         }
 
-        if (collision.gameObject.CompareTag("Monster"))
+        if (collision.gameObject.CompareTag("Monster") && GameManager.inputEnabled)
         {
+            Debug.Log("몬스터충돌");
+            StartCoroutine(InputDelay(0.5f));
             curHp -= 1;
 
             if (rb != null)
@@ -329,8 +367,8 @@ public class PlayerMovement : MonoBehaviour
                 Vector3 direction = transform.position - collision.transform.position;
                 direction.y = 0;
                 direction.Normalize();
-                rb.AddForce(direction * 3.0f, ForceMode.Impulse);
-                StartCoroutine(InputDelay(0.5f));
+                rb.velocity = direction * 5.0f;
+                //rb.AddForce(direction * 5.0f, ForceMode.Impulse);
             }
         }
 
@@ -375,6 +413,24 @@ public class PlayerMovement : MonoBehaviour
             Destroy(other.gameObject);
         }
 
+        if (other.gameObject.CompareTag("SmallHealKit"))
+        {
+            AddCurHp(1);
+            Destroy(other.gameObject);
+        }
+
+        if (other.gameObject.CompareTag("BigHealKit"))
+        {
+            AddCurHp(5);
+            Destroy(other.gameObject);
+        }
+
+        if (other.gameObject.CompareTag("Potion"))
+        {
+            AddMaxHp(1);
+            AddCurHp(1);
+            Destroy(other.transform.gameObject);
+        }
     }
 
 

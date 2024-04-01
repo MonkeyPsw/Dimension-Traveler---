@@ -5,6 +5,7 @@ using UnityEngine;
 public class Wall : MonoBehaviour
 {
     Vector3 wallOriPos;
+    bool isCenter = false;
 
     void Start()
     {
@@ -16,13 +17,21 @@ public class Wall : MonoBehaviour
 
         if (CameraMove.mainCam.orthographic)
         {
-            //Debug.Log("벽가운데로이동");
-            StartCoroutine(MoveToCenterWithDelay(2.0f));
+            if (!isCenter)
+            {
+                //Debug.Log("벽가운데로이동");
+                isCenter = true;
+                StartCoroutine(MoveToCenterWithDelay(2.0f));
+            }
         }
         else
         {
-            //Debug.Log("벽원래대로이동");
-            transform.position = wallOriPos;
+            if (isCenter)
+            {
+                //Debug.Log("벽원래대로이동");
+                isCenter = false;
+                transform.position = wallOriPos;
+            }
         }
 
     }
