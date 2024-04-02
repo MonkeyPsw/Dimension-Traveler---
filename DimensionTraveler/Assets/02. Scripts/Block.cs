@@ -36,7 +36,7 @@ public class Block : MonoBehaviour
     private void OnCollisionEnter(Collision collision)
     {
         // https://teraphonia.tistory.com/719 자식의 태그
-        if (collision.collider.CompareTag("Head"))
+        if (collision.collider.CompareTag("Player"))
         {
             if (!isCoin)
             {

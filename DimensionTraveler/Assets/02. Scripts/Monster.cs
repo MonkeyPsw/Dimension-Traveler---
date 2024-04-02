@@ -56,9 +56,4 @@ public class Monster : MonoBehaviour
         transform.position = new Vector3(0.0f, transform.position.y, transform.position.z); // 중앙으로 이동
     }
 
-    public Vector3 GetWallOriPos()
-    {
-        return monsterOriPos;
-    }
-
 }

@@ -22,8 +22,8 @@ public class CameraMove : MonoBehaviour
     void Start()
     {
         player = GameObject.FindGameObjectWithTag("Player").GetComponent<Transform>();
-        cam2DPos = player.GetChild(1);
-        cam3DPos = player.GetChild(2);
+        cam2DPos = player.GetChild(0);
+        cam3DPos = player.GetChild(1);
         mainCam = Camera.main;
         transform.position = SetPosition();
         transform.rotation = SetRotation();

@@ -43,6 +43,7 @@ public class ItemBlock : MonoBehaviour
             }
 
             gameObject.GetComponentInParent<Renderer>().material = emptyMaterial;
+            collision.gameObject.GetComponent<Rigidbody>().velocity = Vector3.down * 5.0f;
         }
     }
 }

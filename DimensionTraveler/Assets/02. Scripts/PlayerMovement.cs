@@ -13,6 +13,8 @@ public class PlayerMovement : MonoBehaviour
     public static bool isGrounded; // 땅에 닿았는지 여부
     public float jumpMaxY = 3.0f;
     public float jumpY = 0;
+    RaycastHit hit;
+    RaycastHit[] hits;
 
     public int curHp = 10;
     public int maxHp = 10;
@@ -68,6 +70,8 @@ public class PlayerMovement : MonoBehaviour
         float moveHorizontal = Input.GetAxisRaw("Horizontal");
         float moveVertical = Input.GetAxisRaw("Vertical");
 
+        IsGrounded();
+
         if (curHp <= 0)
         {
             curHp = 0;
@@ -112,9 +116,13 @@ public class PlayerMovement : MonoBehaviour
 
         if (GameManager.inputEnabled)
         {
-            transform.Translate(movement * moveSpeed * Time.deltaTime);
+            //transform.Translate(movement * moveSpeed * Time.deltaTime);
             //rb.velocity = movement * moveSpeed;
             // Translate를 쓰면 트리거 충돌이 2번씩 되고 velocity를 쓰면 이동이 끊기고 점프가 안되네
+            // https://rito15.github.io/posts/unity-fixed-update-and-stuttering/
+            // 프레임 설정 문제였다?
+            // 그냥 마리오처럼 가속을 받는게 좋을까?
+            // 나는 그냥 이동하는게 좋은데.
 
             if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
             {
@@ -122,21 +130,22 @@ public class PlayerMovement : MonoBehaviour
                 Jump(jumpForce);
             }
 
-            //if (transform.position.y > jumpMaxY + jumpY)
-            //    rb.velocity = Vector3.down * jumpForce;
+            if (transform.position.y > jumpMaxY + jumpY)
+                rb.velocity = new Vector3(rb.velocity.x, -jumpForce / 2, rb.velocity.z);
         }
 
         if (isReduce)
         {
-            reduceHp = StartCoroutine(ReduceHp(1.0f));
+            //reduceHp = StartCoroutine(ReduceHp(1.0f));
+            ReduceHpAndResetDimensionGauge();
         }
 
-        if (CameraMove.mainCam.orthographic && reduceHp != null)
-        {
-            Debug.Log("HP감소멈춰");
-            StopCoroutine(reduceHp);
-            reduceHp = null;
-        }
+        //if (CameraMove.mainCam.orthographic && reduceHp != null)
+        //{
+        //    Debug.Log("HP감소멈춰");
+        //    StopCoroutine(reduceHp);
+        //    reduceHp = null;
+        //}
 
         curHpText.text = curHp.ToString();
         maxHpText.text = maxHp.ToString();
@@ -144,17 +153,19 @@ public class PlayerMovement : MonoBehaviour
         scoreText.text = "SCORE : " + score;
     }
 
-    //void FixedUpdate()
-    //{
-    //    if (GameManager.inputEnabled)
-    //    {
-    //        rb.velocity = movement * moveSpeed;
-    //    }
-    //    else
-    //    {
-    //        rb.velocity = Vector3.zero;
-    //    }
-    //}
+    void FixedUpdate()
+    {
+        if (GameManager.inputEnabled)
+        {
+            //Vector3 moveDir = new Vector3(movement.x, 0, movement.z);
+            //movement.y = 0;
+            //rb.velocity = movement * moveSpeed * Time.fixedDeltaTime;
+
+            rb.velocity = new Vector3(movement.x * moveSpeed,
+                                      rb.velocity.y,
+                                      movement.z * moveSpeed);
+        }
+    }
 
     //IEnumerator DimensionGaugeChange(float delay)
     //{
@@ -228,7 +239,7 @@ public class PlayerMovement : MonoBehaviour
                 {
                     curDimensionGauge = 0;
                     isReduce = true;
-                    break;
+                    //break;
                 }
             }
         }
@@ -276,6 +287,13 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+    public void ReduceHpAndResetDimensionGauge()
+    {
+        curHp--;
+        curDimensionGauge = maxDimensionGauge;
+        isReduce = false;
+    }
+
     IEnumerator MoveToCenterWithDelay(float delay)
     {
         Debug.Log("3D에서 2D로");
@@ -305,10 +323,11 @@ public class PlayerMovement : MonoBehaviour
         //if (transform.position.y > jumpMaxY + jumpY)
         //    transform.Translate(0, -jumpForce * Time.deltaTime, 0);
 
-        //rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+        rb.AddForce(Vector3.up * force, ForceMode.Impulse);
         //rb.velocity = new Vector3(0f, jumpForce, 0f);
         //rb.velocity = new Vector3(rb.velocity.x, force, rb.velocity.z);
-        rb.velocity = Vector3.up * force;
+        //rb.velocity = Vector3.up * force;
+        
         isGrounded = false;
     }
 
@@ -335,24 +354,47 @@ public class PlayerMovement : MonoBehaviour
         //Time.timeScale = 1.0f;
     }
 
+    private void IsGrounded()
+    {
+        //hits = Physics.RaycastAll(transform.position, Vector3.down, 0.5f);
+
+        //foreach (RaycastHit hit in hits)
+        //{
+        //    Debug.Log("Raycast검사중");
+        //    if (hit.collider.CompareTag("Ground") || hit.collider.CompareTag("Wall") ||
+        //        hit.collider.CompareTag("Block"))
+        //        isGrounded = true;
+
+        //}
+
+        Vector3 dir = transform.TransformDirection(Vector3.down) * 0.45f;
+        Debug.DrawRay(transform.position, dir, Color.yellow);
+
+        // 점프하고 착지할때 모서리로 착지하면 false로 못간다.
+        if (Physics.Raycast(transform.position, Vector3.down, 0.45f))
+            isGrounded = true;
+        else
+            isGrounded = false;
+    }
+
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.CompareTag("Ground"))
         {
-            isGrounded = true;
+            //isGrounded = true;
             isWallCenter = true;
         }
 
         if (collision.gameObject.CompareTag("Wall"))
         {
-            isGrounded = true;
+            //isGrounded = true;
             // 2개 이상의 Wall에 닿을때 문제가 있긴함
             wallPos = collision.gameObject.GetComponent<Wall>().GetWallOriPos();
         }
 
         if (collision.gameObject.CompareTag("Block"))
         {
-            isGrounded = true;
+            //isGrounded = true;
             isWallCenter = true;
         }
 
@@ -367,8 +409,8 @@ public class PlayerMovement : MonoBehaviour
                 Vector3 direction = transform.position - collision.transform.position;
                 direction.y = 0;
                 direction.Normalize();
-                rb.velocity = direction * 5.0f;
-                //rb.AddForce(direction * 5.0f, ForceMode.Impulse);
+                //rb.velocity = direction * 5.0f;
+                rb.AddForce(direction * 5.0f, ForceMode.Impulse);
             }
         }
 
@@ -431,6 +473,14 @@ public class PlayerMovement : MonoBehaviour
             AddCurHp(1);
             Destroy(other.transform.gameObject);
         }
+
+        if (other.gameObject.CompareTag("MonsterHead"))
+        {
+            Jump(jumpForce);
+            Destroy(other.transform.parent.gameObject);
+            AddScore(100);
+        }
+
     }
 
 
