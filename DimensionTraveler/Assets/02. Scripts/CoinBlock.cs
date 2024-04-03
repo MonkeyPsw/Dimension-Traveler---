@@ -2,54 +2,60 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ItemBlock : MonoBehaviour
+public class CoinBlock : MonoBehaviour
 {
     public Material emptyMaterial;
-    public GameObject itemPrefab;
-    
-    GameObject item;
-    Vector3 itemPos;
-    bool isItem = false;
+    //public Texture emptyTexture;
+    public GameObject coinPrefab;
+
+    GameObject coin;
+    Vector3 coinPos;
+    bool isCoin = false;
 
     void Start()
     {
-        
+
     }
 
     void Update()
     {
-        if (item != null)
+        if (coin != null)
         {
             if (CameraMove.mainCam.orthographic)
             {
-                item.transform.position = new Vector3(0, itemPos.y, itemPos.z);
+                coin.transform.position = new Vector3(0, coinPos.y, coinPos.z);
             }
             else
             {
-                item.transform.position = itemPos;
+                coin.transform.position = coinPos;
             }
         }
     }
 
     private void OnCollisionEnter(Collision collision)
     {
+        // https://teraphonia.tistory.com/719 자식의 태그
         if (collision.gameObject.CompareTag("Player"))
         {
             foreach (ContactPoint contact in collision.contacts)
             {
                 if (contact.normal.y > 0.9f)
                 {
-                    if (!isItem)
+                    if (!isCoin)
                     {
-                        itemPos = new Vector3(transform.position.x, transform.position.y + 1.0f, transform.position.z);
-                        item = Instantiate(itemPrefab, itemPos, Quaternion.identity);
-                        isItem = true;
+                        coinPos = new Vector3(transform.position.x, transform.position.y + 1.0f, transform.position.z);
+                        coin = Instantiate(coinPrefab, coinPos, Quaternion.identity);
+                        // 코인 자동 삭제할지 고민, 자동삭제하면 업데이트문 주석처리
+                        isCoin = true;
                         gameObject.GetComponentInParent<Renderer>().material = emptyMaterial;
                         break;
                     }
                 }
             }
             
+            //gameObject.GetComponentInParent<Renderer>().material.SetTexture("_MainTex", emptyTexture);
+
+            //Debug.Log(collision.gameObject.name);
             //collision.gameObject.GetComponent<Rigidbody>().velocity = Vector3.down * 5.0f;
         }
     }

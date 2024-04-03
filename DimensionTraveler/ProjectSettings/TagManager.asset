@@ -11,7 +11,6 @@ TagManager:
   - Head
   - Monster
   - Coin
-  - MonsterHead
   - Foot
   - Treasure
   - SmallHealKit
@@ -24,7 +23,7 @@ TagManager:
   - 
   - Water
   - UI
-  - 
+  - Jump
   - 
   - 
   - 

@@ -12,8 +12,9 @@ GameObject:
   - component: {fileID: 8598525095866344683}
   - component: {fileID: 1887460477451992307}
   - component: {fileID: 96478905383714224}
-  m_Layer: 0
-  m_Name: Block
+  - component: {fileID: 364971401766937749}
+  m_Layer: 6
+  m_Name: CoinBlock
   m_TagString: Block
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -92,7 +93,7 @@ BoxCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3391619830564660987}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 2dddc2c721f163d42907cd8ae38d289b, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -104,8 +105,22 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 0.9, z: 1}
-  m_Center: {x: 0, y: 0.05, z: 0}
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &364971401766937749
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3391619830564660987}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7ad32d6f627dda04db5f45e3b5ac7d01, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  emptyMaterial: {fileID: 2100000, guid: 32f36551f47d99048a91c80ce4b4439d, type: 2}
+  coinPrefab: {fileID: 3222127083702545952, guid: ce173bad9fdbb8140b3bd396e7dc7fcf, type: 3}
 --- !u!1 &3840428607252789702
 GameObject:
   m_ObjectHideFlags: 0
@@ -116,14 +131,14 @@ GameObject:
   m_Component:
   - component: {fileID: 4572575776372304978}
   - component: {fileID: 4688485239964388177}
-  - component: {fileID: 4122154245687748282}
-  m_Layer: 0
+  - component: {fileID: 8209287852998597134}
+  m_Layer: 6
   m_Name: Push
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &4572575776372304978
 Transform:
   m_ObjectHideFlags: 0
@@ -160,7 +175,7 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.9, y: 0.1, z: 0.9}
   m_Center: {x: 0, y: -0.45, z: 0}
---- !u!114 &4122154245687748282
+--- !u!114 &8209287852998597134
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -169,7 +184,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 3840428607252789702}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 72cdd0ed9a189964ab862c6c1c3464ee, type: 3}
+  m_Script: {fileID: 11500000, guid: 7ad32d6f627dda04db5f45e3b5ac7d01, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   emptyMaterial: {fileID: 2100000, guid: 32f36551f47d99048a91c80ce4b4439d, type: 2}

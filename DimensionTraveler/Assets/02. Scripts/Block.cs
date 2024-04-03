@@ -5,13 +5,7 @@ using static UnityEditor.Progress;
 
 public class Block : MonoBehaviour
 {
-    public Material emptyMaterial;
-    //public Texture emptyTexture;
-    public GameObject coinPrefab;
-
-    GameObject coin;
-    Vector3 coinPos;
-    bool isCoin = false;
+    public GameObject destroyEffect;
 
     void Start()
     {
@@ -20,37 +14,26 @@ public class Block : MonoBehaviour
 
     void Update()
     {
-        if (coin != null)
-        {
-            if (CameraMove.mainCam.orthographic)
-            {
-                coin.transform.position = new Vector3(0, coinPos.y, coinPos.z);
-            }
-            else
-            {
-                coin.transform.position = coinPos;
-            }
-        }
+
     }
 
     private void OnCollisionEnter(Collision collision)
     {
-        // https://teraphonia.tistory.com/719 자식의 태그
-        if (collision.collider.CompareTag("Player"))
+        if (collision.gameObject.CompareTag("Player"))
         {
-            if (!isCoin)
+            foreach (ContactPoint contact in collision.contacts)
             {
-                coinPos = new Vector3(transform.position.x, transform.position.y + 1.0f, transform.position.z);
-                coin = Instantiate(coinPrefab, coinPos, Quaternion.identity);
-                // 코인 자동 삭제할지 고민, 자동삭제하면 업데이트문 주석처리
-                isCoin = true;
+                // Player의 윗면과 Cube의 아랫면이 닿았는지 확인
+                if (contact.normal.y > 0.9f) // 윗면의 법선 벡터는 (0, 1, 0)에 가깝습니다.
+                {
+                    // Cube를 없애거나 비활성화하거나 원하는 동작 수행
+                    Destroy(gameObject);
+                    break; // 충돌한 지점 중 하나가 확인되면 반복문을 종료합니다.
+                    // 고맙다 CHATGPT
+                }
             }
 
-            gameObject.GetComponentInParent<Renderer>().material = emptyMaterial;
-            //gameObject.GetComponentInParent<Renderer>().material.SetTexture("_MainTex", emptyTexture);
-
-            //Debug.Log(collision.gameObject.name);
-            collision.gameObject.GetComponent<Rigidbody>().velocity = Vector3.down * 5.0f;
+            //Destroy(transform.parent.gameObject);
         }
     }
 

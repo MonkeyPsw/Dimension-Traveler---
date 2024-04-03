@@ -10,6 +10,8 @@ public class Monster : MonoBehaviour
     Vector3 monsterDirection;
     bool isCenter = false;
     public float moveSpeed = 2.0f;
+    public int atk = 1;
+    public int score = 100;
 
     void Start()
     {

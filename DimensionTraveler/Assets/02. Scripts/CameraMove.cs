@@ -58,7 +58,7 @@ public class CameraMove : MonoBehaviour
 
         toPosition = SetPosition();
         toRotation = SetRotation();
-        transform.position = Vector3.Lerp(transform.position, toPosition, camChangeSpeed * Time.deltaTime);
+        transform.position = Vector3.Lerp(transform.position, toPosition, camChangeSpeed * 3.0f * Time.deltaTime);
         transform.rotation = Quaternion.Slerp(transform.rotation, toRotation, camChangeSpeed * Time.deltaTime);
     }
 
