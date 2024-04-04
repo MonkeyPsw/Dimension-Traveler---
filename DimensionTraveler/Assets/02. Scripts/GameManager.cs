@@ -1,10 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
     public static bool inputEnabled = true;
+    public static int level = 2; // 0:¿ÀÇÁ´×, 1:¸ÞÀÎ¸Þ´º, 2:¸Ê1_1, ...
     float inputDelay = 2.0f; // ÀÔ·Â µô·¹ÀÌ ½Ã°£
 
     public Collider[] colliders;
@@ -16,7 +18,7 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
-        if (inputEnabled)
+        if (inputEnabled && PlayerMovement.isDimension)
         {
             if (Input.GetKeyDown(KeyCode.LeftShift) && PlayerMovement.isGrounded)
             {
@@ -61,4 +63,8 @@ public class GameManager : MonoBehaviour
         //Time.timeScale = 1.0f;
     }
 
+    public static void LoadNextMap()
+    {
+        SceneManager.LoadScene(level);
+    }
 }

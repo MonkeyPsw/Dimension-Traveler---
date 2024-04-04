@@ -12,6 +12,7 @@ public class Monster : MonoBehaviour
     public float moveSpeed = 2.0f;
     public int atk = 1;
     public int score = 100;
+    //bool isMoving = false;
 
     void Start()
     {
@@ -25,7 +26,12 @@ public class Monster : MonoBehaviour
         monsterDirection = directionToPlayer.normalized;
         
         if (directionToPlayer.magnitude < 5.0f && GameManager.inputEnabled)
+        {
+            //isMoving = true;
             transform.Translate(moveSpeed * Time.deltaTime * monsterDirection);
+        }
+        //else
+        //    isMoving = false;
     }
 
     void LateUpdate()

@@ -16,6 +16,9 @@ TagManager:
   - SmallHealKit
   - BigHealKit
   - Potion
+  - MonsterHead
+  - Orb
+  - Portal
   layers:
   - Default
   - TransparentFX

@@ -5,6 +5,8 @@ using UnityEngine.UI;
 
 public class PlayerMovement : MonoBehaviour
 {
+    GameManager gameManager;
+
     public float moveSpeed = 6.0f;
     Vector3 movement;
     Rigidbody rb;
@@ -22,6 +24,8 @@ public class PlayerMovement : MonoBehaviour
     public TextMeshProUGUI maxHpText;
     Coroutine reduceHp;
     bool isReduce = false;
+
+    public static bool isDimension = false; // 1_1 차원 전환 아이템 소지 여부
     float maxDimensionGauge = 10.0f;
     public float curDimensionGauge = 10.0f;
     public float preDimensionGauge = 10.0f;
@@ -51,7 +55,11 @@ public class PlayerMovement : MonoBehaviour
 
     void Start()
     {
+        gameManager = FindObjectOfType<GameManager>();
         rb = GetComponent<Rigidbody>();
+
+        //if (GameManager.level > 2)
+            isDimension = true;
 
         //for (int i = 0; i < (int)maxDimensionGauge; i++)
         //{
@@ -508,6 +516,17 @@ public class PlayerMovement : MonoBehaviour
         //    AddScore(100);
         //}
 
+        if (other.gameObject.CompareTag("Orb"))
+        {
+            isDimension = true;
+            Destroy(other.transform.gameObject);
+        }
+
+        if (other.gameObject.CompareTag("Portal"))
+        {
+            GameManager.level++;
+            GameManager.LoadNextMap();
+        }
     }
 
 
