@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Monster : MonoBehaviour
@@ -12,7 +13,6 @@ public class Monster : MonoBehaviour
     public float moveSpeed = 2.0f;
     public int atk = 1;
     public int score = 100;
-    //bool isMoving = false;
 
     void Start()
     {
@@ -26,12 +26,8 @@ public class Monster : MonoBehaviour
         monsterDirection = directionToPlayer.normalized;
         
         if (directionToPlayer.magnitude < 5.0f && GameManager.inputEnabled)
-        {
-            //isMoving = true;
             transform.Translate(moveSpeed * Time.deltaTime * monsterDirection);
-        }
-        //else
-        //    isMoving = false;
+
     }
 
     void LateUpdate()
@@ -51,8 +47,8 @@ public class Monster : MonoBehaviour
             if (isCenter)
             {
                 isCenter = false;
-                monsterOriPos = transform.position;
-                transform.position = monsterOriPos;
+                //monsterOriPos = transform.position; // ÀÌ°Å ¿Ö ½è¾úÁö
+                transform.position = new Vector3(monsterOriPos.x, transform.position.y, transform.position.z); // xÁÂÇ¥ À¯Áö
             }
         }
 

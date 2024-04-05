@@ -1,5 +1,6 @@
 using System.Collections;
 using TMPro;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -15,6 +16,8 @@ public class PlayerMovement : MonoBehaviour
     public static bool isGrounded; // 땅에 닿았는지 여부
     public float jumpMaxY = 3.0f;
     public float jumpY = 0;
+    public LayerMask jumpLayer;
+    bool canJump = true;
     RaycastHit hit;
     Collider[] cols;
 
@@ -24,6 +27,7 @@ public class PlayerMovement : MonoBehaviour
     public TextMeshProUGUI maxHpText;
     Coroutine reduceHp;
     bool isReduce = false;
+    bool isGod = false;
 
     public static bool isDimension = false; // 1_1 차원 전환 아이템 소지 여부
     float maxDimensionGauge = 10.0f;
@@ -78,7 +82,7 @@ public class PlayerMovement : MonoBehaviour
         float moveHorizontal = Input.GetAxisRaw("Horizontal");
         float moveVertical = Input.GetAxisRaw("Vertical");
 
-        IsGrounded();
+        CheckIsGrounded();
 
         if (curHp <= 0)
         {
@@ -89,10 +93,28 @@ public class PlayerMovement : MonoBehaviour
         if (curHp > maxHp)
             curHp = maxHp;
 
+        if (isGod)
+            gameObject.layer = 8;
+        else
+            gameObject.layer = 7;
+
+        if (transform.position.y < -10)
+        {
+            AddCurHp(-3);
+            transform.position = new Vector3(0, -4.1f, 0);
+        }
+
+
         // 연속으로 차원 전환하는게 좀 이상한데 몰루
         if (CameraMove.mainCam.orthographic) // 2D일때, 3D에서 2D로 갈때
         {
             Debug.Log("if문 3D에서 2D로");
+
+            //if (CheckOverlap())
+            //{
+            //    Debug.Log("겹치면않되");
+            //    // 대충 피깎고 다시 전환하는 기능
+            //}
 
             if (isChange)
                 StartCoroutine(DimensionGaugeChange(2.0f));
@@ -147,7 +169,7 @@ public class PlayerMovement : MonoBehaviour
             //reduceHp = StartCoroutine(ReduceHp(1.0f));
             ReduceHpAndResetDimensionGauge();
         }
-
+        
         //if (CameraMove.mainCam.orthographic && reduceHp != null)
         //{
         //    Debug.Log("HP감소멈춰");
@@ -196,9 +218,20 @@ public class PlayerMovement : MonoBehaviour
         //rb.velocity = Vector3.up * force;
 
         //rb.MovePosition(rb.position + Vector3.up * force * Time.deltaTime);
-        rb.AddForce(new Vector3(0, force, 0f));
+        if (canJump)
+        {
+            rb.AddForce(new Vector3(0, force, 0f));
+            isGrounded = false;
+            canJump = false;
+            StartCoroutine(JumpCool(0.5f));
+        }
 
-        isGrounded = false;
+    } 
+
+    IEnumerator JumpCool(float cool)
+    {
+        yield return new WaitForSecondsRealtime(cool);
+        canJump = true;
     }
 
     //IEnumerator DimensionGaugeChange(float delay)
@@ -365,36 +398,76 @@ public class PlayerMovement : MonoBehaviour
         this.maxHp += hp;
     }
 
-    IEnumerator InputDelay(float delay)
+    IEnumerator InputDelayAndToggleGod(float delay)
     {
         GameManager.inputEnabled = false;
         yield return new WaitForSecondsRealtime(delay); // 입력 딜레이 시간만큼 대기
         GameManager.inputEnabled = true; // 입력 활성화
 
         //무적모드온
-        //ToggleGod();
-        //yield return new WaitForSecondsRealtime(delay);
+        ToggleGod();
+        yield return new WaitForSecondsRealtime(delay * 2.0f);
         //무적모드오프
-        //ToggleGod();
+        ToggleGod();
 
         //Time.timeScale = 1.0f;
     }
 
     public void ToggleGod()
     {
+        isGod = !isGod;
 
+        // 뭔가 깜빡이는 효과?
     }
 
-    private void IsGrounded()
+    private void CheckIsGrounded()
     {
-        //Vector3 dir = transform.TransformDirection(Vector3.down) * 0.45f;
-        //Debug.DrawRay(transform.position, dir, Color.yellow);
+        BoxCollider playerCollider = GetComponent<BoxCollider>();
+
+        Vector3[] raycastOrigins = new Vector3[9];
+        float offsetX = 0.24f;
+        float offsetZ = 0.24f;
+        bool isRay = false;
+
+        // 3D 기준
+        raycastOrigins[0] = transform.position + new Vector3(offsetX, 0.0f, offsetZ); // 앞 오른쪽 꼭지점
+        raycastOrigins[1] = transform.position + new Vector3(0.0f, 0.0f, offsetZ); // 앞 가운데 꼭지점
+        raycastOrigins[2] = transform.position + new Vector3(-offsetX, 0.0f, offsetZ); // 앞 왼쪽 꼭지점
+
+        raycastOrigins[3] = transform.position + new Vector3(offsetX, 0.0f, 0.0f); // 가운데 오른쪽 꼭지점
+        raycastOrigins[4] = transform.position; // 가운데 꼭지점
+        raycastOrigins[5] = transform.position + new Vector3(-offsetX, 0.0f, 0.0f); // 가운데 왼쪽 꼭지점
+
+        raycastOrigins[6] = transform.position + new Vector3(offsetX, 0.0f, -offsetZ); // 뒤 오른쪽 꼭지점
+        raycastOrigins[7] = transform.position + new Vector3(0.0f, 0.0f, -offsetZ); // 뒤 가운데 꼭지점
+        raycastOrigins[8] = transform.position + new Vector3(-offsetX, 0.0f, -offsetZ); // 뒤 왼쪽 꼭지점
+
+        float raycastDistance = playerCollider.size.y / 2f;
+
+        for (int i = 0; i < raycastOrigins.Length; i++)
+            Debug.DrawRay(raycastOrigins[i], Vector3.down * raycastDistance, Color.black);
+
+        foreach (Vector3 origin in raycastOrigins)
+        {
+            if (Physics.Raycast(origin, Vector3.down, raycastDistance, jumpLayer))
+            {
+                isGrounded = true;
+                isRay = true;
+                break;
+            }
+        }
+
+        if (!isRay)
+            isGrounded = false;
+
+        //Debug.DrawRay(transform.position + offset, Vector3.down * raycastDistance, Color.black);
+        //Debug.DrawRay(transform.position - offset, Vector3.down * raycastDistance, Color.black);
 
         // 점프하고 착지할때 모서리로 착지하면 false로 못가고 그냥 모서리로 바로 가도 true
-        if (Physics.Raycast(transform.position, Vector3.down, 0.45f))
-            isGrounded = true;
-        else
-            isGrounded = false;
+        //if (Physics.Raycast(transform.position, Vector3.down, raycastDistance, jumpLayer))
+        //    isGrounded = true;
+        //else
+        //    isGrounded = false;
 
     }
 
@@ -437,7 +510,7 @@ public class PlayerMovement : MonoBehaviour
                 }
 
                 Debug.Log("몬스터충돌");
-                StartCoroutine(InputDelay(0.5f));
+                StartCoroutine(InputDelayAndToggleGod(0.5f));
                 AddCurHp(-collision.gameObject.GetComponent<Monster>().atk);
 
                 Vector3 direction = transform.position - collision.transform.position;

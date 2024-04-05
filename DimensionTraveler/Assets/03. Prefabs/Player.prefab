@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7099689171388660717}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: MainCamera2DPos
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -40,7 +40,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2221593063572549306}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: MainCamera3DPos
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -76,7 +76,7 @@ GameObject:
   - component: {fileID: 5585147552186745691}
   - component: {fileID: 260722180910869067}
   - component: {fileID: 7813086395058655075}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Player
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -187,6 +187,9 @@ MonoBehaviour:
   jumpForce: 350
   jumpMaxY: 3
   jumpY: 0
+  jumpLayer:
+    serializedVersion: 2
+    m_Bits: 512
   curHp: 10
   maxHp: 10
   curHpText: {fileID: 0}

@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 5986958815105224647}
   - component: {fileID: 8443168466387057294}
   - component: {fileID: 9021913500823891281}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: L_MonsterHead
   m_TagString: MonsterHead
   m_Icon: {fileID: 0}
@@ -115,7 +115,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5749677750213734291}
   - component: {fileID: 1138758638354847468}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: HeadPos
   m_TagString: MonsterHead
   m_Icon: {fileID: 0}
@@ -172,7 +172,7 @@ GameObject:
   - component: {fileID: 4426842420658732133}
   - component: {fileID: 7911653408721569399}
   - component: {fileID: 4836313819872970905}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: L_Monster
   m_TagString: Monster
   m_Icon: {fileID: 0}

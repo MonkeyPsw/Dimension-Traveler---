@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 1562974474381582915}
   - component: {fileID: 5193202153603831522}
   - component: {fileID: 2238995607224417663}
-  m_Layer: 6
+  m_Layer: 9
   m_Name: Push
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -81,7 +81,7 @@ GameObject:
   - component: {fileID: 5835075705747395043}
   - component: {fileID: 5863298240588789403}
   - component: {fileID: 4422702252908184679}
-  m_Layer: 6
+  m_Layer: 9
   m_Name: ItemBlock
   m_TagString: Block
   m_Icon: {fileID: 0}
