@@ -4610,7 +4610,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6317359df18274c48a8a49a30963b051, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  colliders: []
 --- !u!4 &1394410635
 Transform:
   m_ObjectHideFlags: 0

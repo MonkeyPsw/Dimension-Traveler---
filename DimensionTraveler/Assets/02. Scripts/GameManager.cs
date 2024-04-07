@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -9,11 +10,35 @@ public class GameManager : MonoBehaviour
     public static int level = 2; // 0:¿ÀÇÁ´×, 1:¸ÞÀÎ¸Þ´º, 2:¸Ê1_1, ...
     float inputDelay = 2.0f; // ÀÔ·Â µô·¹ÀÌ ½Ã°£
 
-    public Collider[] colliders;
+    GameObject pausePanel;
+    bool isPaused = false;
+
+    int curHp = 10;
+    int maxHp = 10;
+    int score = 0;
+
+    //public Collider[] colliders;
+
+    public static GameManager instance;
+
+    private void Awake()
+    {
+        if (instance == null)
+        {
+            instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
 
     void Start()
     {
-        
+        Canvas canvas = FindObjectOfType<Canvas>();
+        pausePanel = canvas.transform.Find("PausePanel").gameObject;
+        pausePanel.SetActive(false);
     }
 
     void Update()
@@ -29,6 +54,10 @@ public class GameManager : MonoBehaviour
             }
         }
 
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            TogglePause();
+        }
     }
 
     public void SetDimension()
@@ -63,8 +92,65 @@ public class GameManager : MonoBehaviour
         //Time.timeScale = 1.0f;
     }
 
+    void PauseGame()
+    {
+        isPaused = true;
+        Time.timeScale = 0f;
+        pausePanel.SetActive(true);
+    }
+
+    void ResumeGame()
+    {
+        isPaused = false;
+        Time.timeScale = 1f;
+        pausePanel.SetActive(false);
+    }
+    
+    void TogglePause()
+    {
+        isPaused = !isPaused;
+        Time.timeScale = isPaused ? 0 : 1.0f;
+        pausePanel.SetActive(isPaused);
+    }
+
+    public void AddScore(int score)
+    {
+        this.score += score;
+    }
+
+    public int GetScore()
+    {
+        return score;
+    }
+
+    public void SetCurHp(int hp)
+    {
+        this.curHp = hp;
+    }
+
+    public void AddCurHp(int hp)
+    {
+        this.curHp += hp;
+    }
+
+    public int GetCurHp()
+    {
+        return curHp;
+    }
+
+    public void AddMaxHp(int hp)
+    {
+        this.maxHp += hp;
+    }
+
+    public int GetMaxHp()
+    {
+        return maxHp;
+    }
+
     public static void LoadNextMap()
     {
         SceneManager.LoadScene(level);
     }
+
 }

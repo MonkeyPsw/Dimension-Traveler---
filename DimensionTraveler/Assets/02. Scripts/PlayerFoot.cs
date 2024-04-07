@@ -13,7 +13,7 @@ public class PlayerFoot : MonoBehaviour
             {
                 playerMovement.Jump(playerMovement.jumpForce * 0.7f);
                 Destroy(other.transform.parent.gameObject);
-                playerMovement.AddScore(100);
+                GameManager.instance.AddScore(100);
             }
         }
     }

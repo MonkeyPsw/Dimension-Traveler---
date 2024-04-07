@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c267556d7f0cd745928e2244716498e, type: 3}
+  m_Name: New Jujube Palette
+  m_EditorClassIdentifier: 
+  m_Failback: {fileID: 2858367890853885865, guid: 1a0fc306204c21e479205156a6267fa8, type: 3}
+  m_Prefabs:
+  - {fileID: 7544906181075683384, guid: 34f106955dc4c6c498bcbfaa95181c88, type: 3}
+  - {fileID: 2073503419974943822, guid: cbd3d7081d1cfb64a926f79f4eaa6360, type: 3}
+  - {fileID: 3391619830564660987, guid: 91ca355bd4b2980488f027e11e8edde8, type: 3}
+  - {fileID: 6890828131560615189, guid: 6b3932a5310a4294ab96edca3c9cbf35, type: 3}
+  - {fileID: 416756893059983693, guid: 891efc3aa05a29f4d9e128eb599f49cd, type: 3}
+  - {fileID: 5103221396093061397, guid: 1b9b07b2ed24f894f872825338476b24, type: 3}
+  - {fileID: 4151557941065209389, guid: af979576f4bff9f44bb988ec7a99bef8, type: 3}

@@ -6,8 +6,6 @@ using UnityEngine.UI;
 
 public class PlayerMovement : MonoBehaviour
 {
-    GameManager gameManager;
-
     public float moveSpeed = 6.0f;
     Vector3 movement;
     Rigidbody rb;
@@ -21,8 +19,6 @@ public class PlayerMovement : MonoBehaviour
     RaycastHit hit;
     Collider[] cols;
 
-    public int curHp = 10;
-    public int maxHp = 10;
     public TextMeshProUGUI curHpText;
     public TextMeshProUGUI maxHpText;
     Coroutine reduceHp;
@@ -39,7 +35,6 @@ public class PlayerMovement : MonoBehaviour
     //public GameObject dimensionGaugePrefab;
     public Slider dimensionGaugeSlider;
 
-    int score = 0;
     public TextMeshProUGUI scoreText;
 
     bool is2D = false;
@@ -47,19 +42,8 @@ public class PlayerMovement : MonoBehaviour
     public Vector3 targetPos;
     bool isWallCenter = false;
 
-    //public static PlayerMovement instance;
-
-    //private void Awake()
-    //{
-    //    if (instance == null)
-    //        instance = this;
-    //    else
-    //        Destroy(gameObject);
-    //}
-
     void Start()
     {
-        gameManager = FindObjectOfType<GameManager>();
         rb = GetComponent<Rigidbody>();
 
         //if (GameManager.level > 2)
@@ -84,14 +68,14 @@ public class PlayerMovement : MonoBehaviour
 
         CheckIsGrounded();
 
-        if (curHp <= 0)
+        if (GameManager.instance.GetCurHp() <= 0)
         {
-            curHp = 0;
+            GameManager.instance.SetCurHp(0);
             Debug.Log("게임종료");
             //return;
         }
-        if (curHp > maxHp)
-            curHp = maxHp;
+        if (GameManager.instance.GetCurHp() > GameManager.instance.GetMaxHp())
+            GameManager.instance.SetCurHp(GameManager.instance.GetMaxHp());
 
         if (isGod)
             gameObject.layer = 8;
@@ -100,7 +84,7 @@ public class PlayerMovement : MonoBehaviour
 
         if (transform.position.y < -10)
         {
-            AddCurHp(-3);
+            GameManager.instance.AddCurHp(-3);
             transform.position = new Vector3(0, -4.1f, 0);
         }
 
@@ -169,7 +153,7 @@ public class PlayerMovement : MonoBehaviour
             //reduceHp = StartCoroutine(ReduceHp(1.0f));
             ReduceHpAndResetDimensionGauge();
         }
-        
+
         //if (CameraMove.mainCam.orthographic && reduceHp != null)
         //{
         //    Debug.Log("HP감소멈춰");
@@ -177,10 +161,10 @@ public class PlayerMovement : MonoBehaviour
         //    reduceHp = null;
         //}
 
-        curHpText.text = curHp.ToString();
-        maxHpText.text = maxHp.ToString();
+        curHpText.text = GameManager.instance.GetCurHp().ToString();
+        maxHpText.text = GameManager.instance.GetMaxHp().ToString();
         dimensionGaugeSlider.value = curDimensionGauge;
-        scoreText.text = "SCORE : " + score;
+        scoreText.text = "SCORE : " + GameManager.instance.GetScore();
     }
 
     void FixedUpdate()
@@ -350,13 +334,13 @@ public class PlayerMovement : MonoBehaviour
         {
             yield return new WaitForSecondsRealtime(delay);
             Debug.Log("HP 감소");
-            curHp--;
+            GameManager.instance.AddCurHp(-1);
         }
     }
 
     public void ReduceHpAndResetDimensionGauge()
     {
-        curHp--;
+        GameManager.instance.AddCurHp(-1);
         curDimensionGauge = maxDimensionGauge / 2;
         isReduce = false;
     }
@@ -381,21 +365,6 @@ public class PlayerMovement : MonoBehaviour
         transform.position = targetPos;
 
         isWallCenter = true;
-    }
-
-    public void AddScore(int score)
-    {
-        this.score += score;
-    }
-
-    public void AddCurHp(int hp)
-    {
-        this.curHp += hp;
-    }
-
-    public void AddMaxHp(int hp)
-    {
-        this.maxHp += hp;
     }
 
     IEnumerator InputDelayAndToggleGod(float delay)
@@ -504,14 +473,14 @@ public class PlayerMovement : MonoBehaviour
                         Debug.Log("몬스터컷");
                         rb.velocity = new Vector3(rb.velocity.x, jumpForce * 0.012f, rb.velocity.z);
                         Destroy(collision.gameObject);
-                        AddScore(collision.gameObject.GetComponent<Monster>().score);
+                        GameManager.instance.AddScore(collision.gameObject.GetComponent<Monster>().score);
                         return;
                     }
                 }
 
                 Debug.Log("몬스터충돌");
                 StartCoroutine(InputDelayAndToggleGod(0.5f));
-                AddCurHp(-collision.gameObject.GetComponent<Monster>().atk);
+                GameManager.instance.AddCurHp(-collision.gameObject.GetComponent<Monster>().atk);
 
                 Vector3 direction = transform.position - collision.transform.position;
                 direction.y = 0;
@@ -552,32 +521,32 @@ public class PlayerMovement : MonoBehaviour
     {
         if (other.gameObject.CompareTag("Coin"))
         {
-            AddScore(100);
+            GameManager.instance.AddScore(100);
             Destroy(other.gameObject);
         }
 
         if (other.gameObject.CompareTag("Treasure"))
         {
-            AddScore(1000);
+            GameManager.instance.AddScore(1000);
             Destroy(other.gameObject);
         }
 
         if (other.gameObject.CompareTag("SmallHealKit"))
         {
-            AddCurHp(1);
+            GameManager.instance.AddCurHp(1);
             Destroy(other.gameObject);
         }
 
         if (other.gameObject.CompareTag("BigHealKit"))
         {
-            AddCurHp(5);
+            GameManager.instance.AddCurHp(5);
             Destroy(other.gameObject);
         }
 
         if (other.gameObject.CompareTag("Potion"))
         {
-            AddMaxHp(1);
-            AddCurHp(1);
+            GameManager.instance.AddMaxHp(1);
+            GameManager.instance.AddCurHp(1);
             Destroy(other.transform.gameObject);
         }
 
