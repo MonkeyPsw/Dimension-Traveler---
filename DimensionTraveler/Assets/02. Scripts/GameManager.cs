@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
@@ -10,6 +11,7 @@ public class GameManager : MonoBehaviour
     public static int level = 2; // 0:¿ÀÇÁ´×, 1:¸ÞÀÎ¸Þ´º, 2:¸Ê1_1, ...
     float inputDelay = 2.0f; // ÀÔ·Â µô·¹ÀÌ ½Ã°£
 
+    Canvas canvas;
     GameObject pausePanel;
     bool isPaused = false;
 
@@ -26,9 +28,18 @@ public class GameManager : MonoBehaviour
         if (instance == null)
         {
             instance = this;
-            DontDestroyOnLoad(gameObject);
+
+            canvas = FindObjectOfType<Canvas>();
+            if (canvas != null)
+            {
+                pausePanel = canvas.transform.Find("PausePanel")?.gameObject;
+                if (pausePanel != null)
+                {
+                    pausePanel.SetActive(false);
+                }
+            }
         }
-        else
+        else if (instance != this)
         {
             Destroy(gameObject);
         }
@@ -36,14 +47,12 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        Canvas canvas = FindObjectOfType<Canvas>();
-        pausePanel = canvas.transform.Find("PausePanel").gameObject;
-        pausePanel.SetActive(false);
+        
     }
 
     void Update()
     {
-        if (inputEnabled && PlayerMovement.isDimension)
+        if (inputEnabled && !isPaused && PlayerMovement.isDimension)
         {
             if (Input.GetKeyDown(KeyCode.LeftShift) && PlayerMovement.isGrounded)
             {
@@ -106,7 +115,7 @@ public class GameManager : MonoBehaviour
         pausePanel.SetActive(false);
     }
     
-    void TogglePause()
+    public void TogglePause()
     {
         isPaused = !isPaused;
         Time.timeScale = isPaused ? 0 : 1.0f;
@@ -153,4 +162,24 @@ public class GameManager : MonoBehaviour
         SceneManager.LoadScene(level);
     }
 
+    public void ReLoadCurrentMap()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+
+        Canvas canvas = FindObjectOfType<Canvas>();
+        if (canvas != null)
+        {
+            GameObject pausePanel = canvas.transform.Find("PausePanel")?.gameObject;
+            if (pausePanel != null)
+            {
+                pausePanel.SetActive(false);
+                TogglePause();
+            }
+        }
+    }
+
+    public void QuitGame()
+    {
+        Application.Quit();
+    }
 }

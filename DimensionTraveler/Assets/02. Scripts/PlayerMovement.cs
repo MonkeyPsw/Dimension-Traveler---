@@ -444,20 +444,18 @@ public class PlayerMovement : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Ground"))
         {
-            //isGrounded = true;
+            wallPos.x = 0;
             isWallCenter = true;
         }
 
         if (collision.gameObject.CompareTag("Wall"))
         {
-            //isGrounded = true;
             // 2개 이상의 Wall에 닿을때 문제가 있긴함
             wallPos = collision.gameObject.GetComponent<Wall>().GetWallOriPos();
         }
 
         if (collision.gameObject.CompareTag("Block"))
         {
-            //isGrounded = true;
             isWallCenter = true;
         }
 
@@ -479,7 +477,7 @@ public class PlayerMovement : MonoBehaviour
                 }
 
                 Debug.Log("몬스터충돌");
-                StartCoroutine(InputDelayAndToggleGod(0.5f));
+                StartCoroutine(InputDelayAndToggleGod(0.5f)); // 이벤트로 변경해야함?
                 GameManager.instance.AddCurHp(-collision.gameObject.GetComponent<Monster>().atk);
 
                 Vector3 direction = transform.position - collision.transform.position;
@@ -509,11 +507,10 @@ public class PlayerMovement : MonoBehaviour
 
     private void OnCollisionExit(Collision collision)
     {
-        if (collision.gameObject.CompareTag("Ground") || collision.gameObject.CompareTag("Wall"))
-        {
-            //isGrounded = false;
-            wallPos.x = 0;
-        }
+        //if (collision.gameObject.CompareTag("Ground"))
+        //{
+        //    wallPos.x = 0;
+        //}
 
     }
 

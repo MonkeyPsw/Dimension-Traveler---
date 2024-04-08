@@ -22,6 +22,12 @@ public class Wall : MonoBehaviour
                 //Debug.Log("벽가운데로이동");
                 isCenter = true;
                 StartCoroutine(MoveToCenterWithDelay(2.0f));
+                //Debug.Log(IsWall());
+                if (IsWall())
+                {
+                    Debug.Log("벽겹친다");
+                    //gameObject.GetComponent<MeshRenderer>().enabled = false;
+                }
             }
         }
         else
@@ -49,35 +55,24 @@ public class Wall : MonoBehaviour
         return wallOriPos;
     }
 
-    private void OnCollisionEnter(Collision collision)
+    bool IsWall()
     {
-        if (collision.gameObject.CompareTag("Wall"))
+        Collider wallCollider = GetComponent<BoxCollider>();
+
+        Vector3 worldCenter = wallCollider.transform.TransformPoint(wallCollider.bounds.center);
+        Vector3 worldHalfExtents = Vector3.Scale(wallCollider.bounds.size, wallCollider.transform.lossyScale) * 0.5f;
+        Collider[] colliders = Physics.OverlapBox(worldCenter, worldHalfExtents, wallCollider.transform.rotation);
+        //Collider[] colliders = Physics.OverlapBox(transform.position, transform.localScale / 2);
+
+        foreach (Collider col in colliders)
         {
-            Collider[] colliders = Physics.OverlapBox(transform.position, transform.localScale / 2);
-
-            // 충돌한 벽 중에서 하나만 선택합니다.
-            GameObject selectedWall = null;
-            foreach (var collider in colliders)
+            if (col.CompareTag("Wall"))
             {
-                if (collider.gameObject != gameObject)
-                {
-                    selectedWall = collider.gameObject;
-                    break;
-                }
-            }
-
-            // 선택된 벽 이외의 모든 벽의 Mesh Renderer를 비활성화합니다.
-            foreach (var collider in colliders)
-            {
-                if (collider.gameObject != selectedWall)
-                {
-                    MeshRenderer renderer = collider.gameObject.GetComponent<MeshRenderer>();
-                    if (renderer != null)
-                        renderer.enabled = false;
-                }
+                return true;
             }
         }
-    }
 
+        return false;
+    }
 
 }

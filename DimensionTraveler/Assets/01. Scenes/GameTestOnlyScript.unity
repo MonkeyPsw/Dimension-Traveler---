@@ -6927,7 +6927,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6317359df18274c48a8a49a30963b051, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  colliders: []
 --- !u!4 &1394410635
 Transform:
   m_ObjectHideFlags: 0
@@ -11491,14 +11490,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 260722180910869067, guid: 34f106955dc4c6c498bcbfaa95181c88, type: 3}
-      propertyPath: curHp
-      value: 10
-      objectReference: {fileID: 0}
-    - target: {fileID: 260722180910869067, guid: 34f106955dc4c6c498bcbfaa95181c88, type: 3}
-      propertyPath: maxHp
-      value: 10
-      objectReference: {fileID: 0}
     - target: {fileID: 820175891594047831, guid: 34f106955dc4c6c498bcbfaa95181c88, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0

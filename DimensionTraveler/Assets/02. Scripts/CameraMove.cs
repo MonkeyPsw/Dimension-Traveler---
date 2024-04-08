@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UIElements;
@@ -58,7 +59,10 @@ public class CameraMove : MonoBehaviour
 
         toPosition = SetPosition();
         toRotation = SetRotation();
-        transform.position = Vector3.Lerp(transform.position, toPosition, camChangeSpeed * 3.0f * Time.deltaTime);
+        //if (transform.position.z < -6.0f)
+        //    transform.position = new Vector3(toPosition.x, toPosition.y, -6.0f);
+        //else
+            transform.position = Vector3.Lerp(transform.position, toPosition, camChangeSpeed * 3.0f * Time.deltaTime);
         transform.rotation = Quaternion.Slerp(transform.rotation, toRotation, camChangeSpeed * Time.deltaTime);
     }
 
@@ -94,7 +98,12 @@ public class CameraMove : MonoBehaviour
         //return mainCam.orthographic ? cam2DPos.position : cam3DPos.position;
         Vector3 position = mainCam.orthographic ? cam2DPos.position : cam3DPos.position;
         if (mainCam.orthographic)
-            position.y = -1.0f;
+        {
+            if (cam2DPos.transform.parent.position.y > 1.8f)
+                position.y = Mathf.Lerp(position.y, cam2DPos.position.y, camChangeSpeed * Time.deltaTime);
+            else
+                position.y = -1.0f;
+        }
         return position;
     }
 

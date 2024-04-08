@@ -25,7 +25,7 @@ Transform:
   m_GameObject: {fileID: 1824086903007069096}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0.7071068, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: 14.285713, y: 2.5, z: 0}
+  m_LocalPosition: {x: 14.285713, y: -2.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -190,8 +190,6 @@ MonoBehaviour:
   jumpLayer:
     serializedVersion: 2
     m_Bits: 512
-  curHp: 10
-  maxHp: 10
   curHpText: {fileID: 0}
   maxHpText: {fileID: 0}
   curDimensionGauge: 10
