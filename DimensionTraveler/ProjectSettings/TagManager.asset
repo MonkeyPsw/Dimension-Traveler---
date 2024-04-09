@@ -19,6 +19,7 @@ TagManager:
   - MonsterHead
   - Orb
   - Portal
+  - Stone
   layers:
   - Default
   - TransparentFX

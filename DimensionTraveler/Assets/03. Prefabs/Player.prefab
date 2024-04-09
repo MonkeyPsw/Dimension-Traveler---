@@ -194,6 +194,10 @@ MonoBehaviour:
   maxHpText: {fileID: 0}
   curDimensionGauge: 10
   preDimensionGauge: 10
+  targetLayer:
+    serializedVersion: 2
+    m_Bits: 512
+  collisionThreshold: 0.5
   dimensionGaugeSlider: {fileID: 0}
   scoreText: {fileID: 0}
   wallPos: {x: 0, y: 0, z: 0}

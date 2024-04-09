@@ -30,6 +30,8 @@ public class PlayerMovement : MonoBehaviour
     public float curDimensionGauge = 10.0f;
     public float preDimensionGauge = 10.0f;
     public static bool isChange = false;
+    public LayerMask targetLayer; // 충돌을 감지할 레이어
+    public float collisionThreshold = 1.0f; // 절반 이상 충돌되었다고 판단할 기준값
 
     //public GameObject dimensionGaugeParent;
     //public GameObject dimensionGaugePrefab;
@@ -371,10 +373,10 @@ public class PlayerMovement : MonoBehaviour
     {
         GameManager.inputEnabled = false;
         yield return new WaitForSecondsRealtime(delay); // 입력 딜레이 시간만큼 대기
-        GameManager.inputEnabled = true; // 입력 활성화
 
         //무적모드온
         ToggleGod();
+        GameManager.inputEnabled = true; // 입력 활성화
         yield return new WaitForSecondsRealtime(delay * 2.0f);
         //무적모드오프
         ToggleGod();
@@ -456,9 +458,11 @@ public class PlayerMovement : MonoBehaviour
 
         if (collision.gameObject.CompareTag("Block"))
         {
+            wallPos.x = 0;
             isWallCenter = true;
         }
 
+        // 언제 Monster 스크립트로 옮겨야할듯?
         if (collision.gameObject.CompareTag("Monster") && GameManager.inputEnabled)
         {
             if (rb != null)
@@ -477,7 +481,7 @@ public class PlayerMovement : MonoBehaviour
                 }
 
                 Debug.Log("몬스터충돌");
-                StartCoroutine(InputDelayAndToggleGod(0.5f)); // 이벤트로 변경해야함?
+                StartCoroutine(InputDelayAndToggleGod(0.5f));
                 GameManager.instance.AddCurHp(-collision.gameObject.GetComponent<Monster>().atk);
 
                 Vector3 direction = transform.position - collision.transform.position;
@@ -488,6 +492,31 @@ public class PlayerMovement : MonoBehaviour
             }
         }
 
+        if (collision.gameObject.CompareTag("Stone"))
+        {
+            Debug.Log("돌충돌");
+
+            StartCoroutine(InputDelayAndToggleGod(1.0f));
+        }
+
+        // 안된다.
+        // 충돌한 오브젝트가 특정 레이어에 속하는지 확인
+        if (((1 << collision.gameObject.layer) & targetLayer) != 0)
+        {
+            // 충돌 지점을 확인
+            ContactPoint contactPoint = collision.contacts[0];
+            // 충돌 지점과 플레이어의 중심 사이의 거리를 계산
+            float distanceToCenter = Vector3.Distance(contactPoint.point, transform.position);
+            // 플레이어의 BoxCollider의 절반 크기 계산
+            Vector3 boxColliderHalfExtents = GetComponent<BoxCollider>().size / 2f;
+
+            // 절반 이상 충돌되었는지 확인
+            if (distanceToCenter > boxColliderHalfExtents.magnitude * collisionThreshold)
+            {
+                Debug.Log("플레이어의 BoxCollider와 절반 이상 충돌되었습니다.");
+                // 이후 원하는 처리를 수행
+            }
+        }
     }
 
     //private void OnCollisionStay(Collision collision)
