@@ -96,6 +96,8 @@ public class Monster : MonoBehaviour
     //    return false;
     //}
 
+
+
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.CompareTag("Wall"))
@@ -104,7 +106,34 @@ public class Monster : MonoBehaviour
             isWall = true;
         }
 
+        if (collision.gameObject.CompareTag("Player") && GameManager.inputEnabled)
+        {
+            if (collision.rigidbody != null)
+            {
+                foreach (ContactPoint contact in collision.contacts)
+                {
+                    // Player의 아랫면과 Monster의 윗면이 닿았는지 확인
+                    if (contact.normal.y < -0.9f)
+                    {
+                        Debug.Log("몬스터컷");
+                        //rb.velocity = new Vector3(rb.velocity.x, jumpForce * 0.012f, rb.velocity.z);
+                        Destroy(gameObject);
+                        GameManager.instance.AddScore(score);
+                        return;
+                    }
+                }
 
+                Debug.Log("몬스터충돌");
+                //StartCoroutine(InputDelayAndToggleGod(0.5f));
+                GameManager.instance.AddCurHp(-atk);
+
+                Vector3 direction = transform.position - collision.transform.position;
+                direction.y = 0;
+                direction.Normalize();
+                //rb.AddForce(direction * 5.0f, ForceMode.VelocityChange);
+
+            }
+        }
     }
 
 

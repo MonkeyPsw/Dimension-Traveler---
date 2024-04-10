@@ -467,28 +467,28 @@ public class PlayerMovement : MonoBehaviour
         {
             if (rb != null)
             {
-                foreach (ContactPoint contact in collision.contacts)
-                {
-                    // Player의 아랫면과 Monster의 윗면이 닿았는지 확인
-                    if (contact.normal.y > 0.9f)
-                    {
-                        Debug.Log("몬스터컷");
-                        rb.velocity = new Vector3(rb.velocity.x, jumpForce * 0.012f, rb.velocity.z);
-                        Destroy(collision.gameObject);
-                        GameManager.instance.AddScore(collision.gameObject.GetComponent<Monster>().score);
-                        return;
-                    }
-                }
+                //foreach (ContactPoint contact in collision.contacts)
+                //{
+                //    // Player의 아랫면과 Monster의 윗면이 닿았는지 확인
+                //    if (contact.normal.y > 0.9f)
+                //    {
+                //        Debug.Log("몬스터컷");
+                //        rb.velocity = new Vector3(rb.velocity.x, jumpForce * 0.012f, rb.velocity.z);
+                //        Destroy(collision.gameObject);
+                //        GameManager.instance.AddScore(collision.gameObject.GetComponent<Monster>().score);
+                //        return;
+                //    }
+                //}
 
-                Debug.Log("몬스터충돌");
-                StartCoroutine(InputDelayAndToggleGod(0.5f));
-                GameManager.instance.AddCurHp(-collision.gameObject.GetComponent<Monster>().atk);
+                //Debug.Log("몬스터충돌");
+                //StartCoroutine(InputDelayAndToggleGod(0.5f));
+                //GameManager.instance.AddCurHp(-collision.gameObject.GetComponent<Monster>().atk);
 
-                Vector3 direction = transform.position - collision.transform.position;
-                direction.y = 0;
-                direction.Normalize();
-                //rb.velocity = direction * 5.0f;
-                rb.AddForce(direction * 5.0f, ForceMode.VelocityChange);
+                //Vector3 direction = transform.position - collision.transform.position;
+                //direction.y = 0;
+                //direction.Normalize();
+                ////rb.velocity = direction * 5.0f;
+                //rb.AddForce(direction * 5.0f, ForceMode.VelocityChange);
             }
         }
 
