@@ -15,6 +15,7 @@ public class Monster : MonoBehaviour
     float verticalRange = 3.5f;
     public int atk = 1;
     public int score = 100;
+    bool isDead = false;
 
     void Start()
     {
@@ -29,7 +30,7 @@ public class Monster : MonoBehaviour
         if (isWall)
             return;
 
-        if (directionToPlayer.magnitude < 5.0f && Mathf.Abs(directionToPlayer.y) <= verticalRange && GameManager.inputEnabled)
+        if (!isDead && directionToPlayer.magnitude < 5.0f && Mathf.Abs(directionToPlayer.y) <= verticalRange && GameManager.inputEnabled)
         {
             monsterDirection.y = 0;
             transform.Translate(moveSpeed * Time.deltaTime * monsterDirection);
@@ -96,7 +97,33 @@ public class Monster : MonoBehaviour
     //    return false;
     //}
 
+    IEnumerator MonsterDead(float delay)
+    {
+        // 몬스터의 스케일을 줄입니다.
+        float originalYScale = transform.GetChild(2).localScale.y;
+        float targetYScale = originalYScale * 0.5f;
+        float duration = 0.25f; // 변경에 걸리는 시간
+        float elapsed = 0.0f;
 
+        isDead = true;
+        // 이게 맞아? 되긴되는데 몰루
+        GetComponent<BoxCollider>().enabled = false;
+        GetComponent<Rigidbody>().isKinematic = true;
+
+        while (elapsed < duration)
+        {
+            float newYScale = Mathf.Lerp(originalYScale, targetYScale, elapsed / duration);
+            transform.GetChild(2).localScale =
+                new Vector3(transform.GetChild(2).localScale.x, newYScale, transform.GetChild(2).localScale.z);
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        yield return new WaitForSeconds(delay);
+
+        // 게임 오브젝트를 삭제합니다.
+        Destroy(gameObject);
+    }
 
     private void OnCollisionEnter(Collision collision)
     {
@@ -108,6 +135,9 @@ public class Monster : MonoBehaviour
 
         if (collision.gameObject.CompareTag("Player") && GameManager.inputEnabled)
         {
+            PlayerMovement player = collision.gameObject.GetComponent<PlayerMovement>();
+            Rigidbody rb = collision.rigidbody;
+
             if (collision.rigidbody != null)
             {
                 foreach (ContactPoint contact in collision.contacts)
@@ -116,21 +146,24 @@ public class Monster : MonoBehaviour
                     if (contact.normal.y < -0.9f)
                     {
                         Debug.Log("몬스터컷");
-                        //rb.velocity = new Vector3(rb.velocity.x, jumpForce * 0.012f, rb.velocity.z);
-                        Destroy(gameObject);
+                        rb.velocity = new Vector3(rb.velocity.x, player.jumpForce * 0.012f, rb.velocity.z);
+                        StartCoroutine(MonsterDead(0.5f));
+                        //Destroy(gameObject);
                         GameManager.instance.AddScore(score);
                         return;
                     }
                 }
 
                 Debug.Log("몬스터충돌");
+                player.HitMonster(0.5f);
                 //StartCoroutine(InputDelayAndToggleGod(0.5f));
                 GameManager.instance.AddCurHp(-atk);
 
-                Vector3 direction = transform.position - collision.transform.position;
+                Vector3 direction = collision.transform.position - transform.position;
                 direction.y = 0;
                 direction.Normalize();
-                //rb.AddForce(direction * 5.0f, ForceMode.VelocityChange);
+                //rb.velocity = direction * 5.0f;
+                rb.AddForce(direction * 5.0f, ForceMode.VelocityChange);
 
             }
         }

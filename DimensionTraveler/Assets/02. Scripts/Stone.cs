@@ -43,7 +43,18 @@ public class Stone : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Player"))
         {
+            PlayerMovement player = collision.gameObject.GetComponent<PlayerMovement>();
+            Rigidbody rb = collision.rigidbody;
+
+            Debug.Log("µ¹Ãæµ¹");
+            player.HitMonster(1.0f);
             GameManager.instance.AddCurHp(-3);
+
+            Vector3 direction = collision.transform.position - transform.position;
+            direction.y = 0;
+            direction.Normalize();
+            rb.AddForce(direction * 8.0f, ForceMode.VelocityChange);
+
             Destroy(gameObject);
         }
     }

@@ -1,6 +1,5 @@
 using System.Collections;
 using TMPro;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -44,9 +43,14 @@ public class PlayerMovement : MonoBehaviour
     public Vector3 targetPos;
     bool isWallCenter = false;
 
+    public Animator animator;
+    //float rotateSpeed = 20.0f;
+    public GameObject playerSkinPrefab;
+
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+        animator = GetComponentInChildren<Animator>();
 
         //if (GameManager.level > 2)
             isDimension = true;
@@ -69,6 +73,8 @@ public class PlayerMovement : MonoBehaviour
         float moveVertical = Input.GetAxisRaw("Vertical");
 
         CheckIsGrounded();
+        // 바닥에 스치기만해도 점프끝남 - Ray수정
+        animator.SetBool("isGrounded", isGrounded);
 
         if (GameManager.instance.GetCurHp() <= 0)
         {
@@ -84,9 +90,13 @@ public class PlayerMovement : MonoBehaviour
         else
             gameObject.layer = 7;
 
+        // 추락
         if (transform.position.y < -10)
         {
             GameManager.instance.AddCurHp(-3);
+            StartCoroutine(InputDelayAndToggleGod(2.0f));
+            animator.SetTrigger("isDrop");
+            animator.SetFloat("Move", 0);
             transform.position = new Vector3(0, -4.1f, 0);
         }
 
@@ -103,7 +113,12 @@ public class PlayerMovement : MonoBehaviour
             //}
 
             if (isChange)
+            {
+                animator.SetTrigger("isChange");
+                animator.SetFloat("Move", 0);
+                transform.GetChild(2).localRotation = Quaternion.Euler(0, 90, 0);
                 StartCoroutine(DimensionGaugeChange(2.0f));
+            }
 
             isWallCenter = false;
 
@@ -113,13 +128,30 @@ public class PlayerMovement : MonoBehaviour
 
             // Orthographic 2D일 때는 좌우키로 z축 이동
             movement = new Vector3(0f, 0f, moveHorizontal).normalized;
+
+            // 애니메이션
+            if (GameManager.inputEnabled)
+            {
+                animator.SetFloat("Move", Mathf.Abs(moveHorizontal));
+
+                // 깡으로 회전넣음
+                if (moveHorizontal < 0)
+                    transform.GetChild(2).localRotation = Quaternion.Euler(0, 180, 0);
+                else if (moveHorizontal > 0)
+                    transform.GetChild(2).localRotation = Quaternion.Euler(0, 0, 0);
+            }
         }
         else // 3D일때, 2D에서 3D로 갈때
         {
             Debug.Log("else문 2D에서 3D로");
 
             if (isChange)
+            {
+                animator.SetTrigger("isChange");
+                animator.SetFloat("Move", 0);
+                transform.GetChild(2).localRotation = Quaternion.Euler(0, 180, 0);
                 StartCoroutine(DimensionGaugeChange(2.0f));
+            }
 
             is2D = true;
 
@@ -128,6 +160,17 @@ public class PlayerMovement : MonoBehaviour
 
             // Perspective 3D일 때는 상하키로 z축, 좌우키로 x방향 이동
             movement = new Vector3(moveHorizontal, 0f, moveVertical).normalized;
+
+            // 애니메이션
+            if (GameManager.inputEnabled)
+            {
+                animator.SetFloat("Move", movement.magnitude);
+
+                // 깡으로 회전넣음
+                if (movement.magnitude != 0)
+                    transform.GetChild(2).forward = movement;
+                    //transform.GetChild(2).forward = Vector3.Lerp(transform.GetChild(2).forward, movement, rotateSpeed * Time.deltaTime);
+            }
         }
 
         if (GameManager.inputEnabled)
@@ -180,7 +223,7 @@ public class PlayerMovement : MonoBehaviour
             //rb.velocity = new Vector3(movement.x * moveSpeed,
             //                          rb.velocity.y,
             //                          movement.z * moveSpeed);
-
+            
             rb.MovePosition(rb.position + new Vector3(movement.x * moveSpeed * Time.deltaTime,
                             rb.velocity.y * Time.deltaTime,
                             movement.z * moveSpeed * Time.deltaTime));
@@ -257,7 +300,7 @@ public class PlayerMovement : MonoBehaviour
 
         yield return new WaitForSecondsRealtime(delay); // 딜레이 만큼 대기
 
-        DimensionGaugeCount();
+        //DimensionGaugeCount();
 
         if (CameraMove.mainCam.orthographic)
         {
@@ -389,6 +432,26 @@ public class PlayerMovement : MonoBehaviour
         isGod = !isGod;
 
         // 뭔가 깜빡이는 효과?
+        if (isGod)
+        {
+            InvokeRepeating(nameof(ToggleBlink), 0, 0.1f);
+        }
+        else
+        {
+            CancelInvoke(nameof(ToggleBlink));
+            playerSkinPrefab.SetActive(true);
+        }
+    }
+
+    void ToggleBlink()
+    {
+        playerSkinPrefab.SetActive(!playerSkinPrefab.activeSelf);
+    }
+
+    public void HitMonster(float time)
+    {
+        animator.SetTrigger("Hit");
+        StartCoroutine(InputDelayAndToggleGod(time));
     }
 
     private void CheckIsGrounded()
@@ -396,8 +459,8 @@ public class PlayerMovement : MonoBehaviour
         BoxCollider playerCollider = GetComponent<BoxCollider>();
 
         Vector3[] raycastOrigins = new Vector3[9];
-        float offsetX = 0.24f;
-        float offsetZ = 0.24f;
+        float offsetX = 0.14f;
+        float offsetZ = 0.14f;
         bool isRay = false;
 
         // 3D 기준
@@ -413,7 +476,8 @@ public class PlayerMovement : MonoBehaviour
         raycastOrigins[7] = transform.position + new Vector3(0.0f, 0.0f, -offsetZ); // 뒤 가운데 꼭지점
         raycastOrigins[8] = transform.position + new Vector3(-offsetX, 0.0f, -offsetZ); // 뒤 왼쪽 꼭지점
 
-        float raycastDistance = playerCollider.size.y / 2f;
+        //float raycastDistance = playerCollider.size.y / 2f;
+        float raycastDistance = 0.42f;
 
         for (int i = 0; i < raycastOrigins.Length; i++)
             Debug.DrawRay(raycastOrigins[i], Vector3.down * raycastDistance, Color.black);
@@ -460,43 +524,6 @@ public class PlayerMovement : MonoBehaviour
         {
             wallPos.x = 0;
             isWallCenter = true;
-        }
-
-        // 언제 Monster 스크립트로 옮겨야할듯?
-        if (collision.gameObject.CompareTag("Monster") && GameManager.inputEnabled)
-        {
-            if (rb != null)
-            {
-                //foreach (ContactPoint contact in collision.contacts)
-                //{
-                //    // Player의 아랫면과 Monster의 윗면이 닿았는지 확인
-                //    if (contact.normal.y > 0.9f)
-                //    {
-                //        Debug.Log("몬스터컷");
-                //        rb.velocity = new Vector3(rb.velocity.x, jumpForce * 0.012f, rb.velocity.z);
-                //        Destroy(collision.gameObject);
-                //        GameManager.instance.AddScore(collision.gameObject.GetComponent<Monster>().score);
-                //        return;
-                //    }
-                //}
-
-                //Debug.Log("몬스터충돌");
-                //StartCoroutine(InputDelayAndToggleGod(0.5f));
-                //GameManager.instance.AddCurHp(-collision.gameObject.GetComponent<Monster>().atk);
-
-                //Vector3 direction = transform.position - collision.transform.position;
-                //direction.y = 0;
-                //direction.Normalize();
-                ////rb.velocity = direction * 5.0f;
-                //rb.AddForce(direction * 5.0f, ForceMode.VelocityChange);
-            }
-        }
-
-        if (collision.gameObject.CompareTag("Stone"))
-        {
-            Debug.Log("돌충돌");
-
-            StartCoroutine(InputDelayAndToggleGod(1.0f));
         }
 
         // 안된다.
@@ -590,6 +617,8 @@ public class PlayerMovement : MonoBehaviour
             Destroy(other.transform.gameObject);
         }
 
+        // 수정필요
+        // 포탈 옆에서 차원전환시 로드 실패?
         if (other.gameObject.CompareTag("Portal"))
         {
             GameManager.level++;
