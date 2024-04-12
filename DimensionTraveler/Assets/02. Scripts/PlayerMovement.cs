@@ -69,12 +69,6 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
-        float moveHorizontal = Input.GetAxisRaw("Horizontal");
-        float moveVertical = Input.GetAxisRaw("Vertical");
-
-        CheckIsGrounded();
-        // 바닥에 스치기만해도 점프끝남 - Ray수정
-        animator.SetBool("isGrounded", isGrounded);
 
         if (GameManager.instance.GetCurHp() <= 0)
         {
@@ -82,6 +76,7 @@ public class PlayerMovement : MonoBehaviour
             Debug.Log("게임종료");
             //return;
         }
+
         if (GameManager.instance.GetCurHp() > GameManager.instance.GetMaxHp())
             GameManager.instance.SetCurHp(GameManager.instance.GetMaxHp());
 
@@ -100,6 +95,33 @@ public class PlayerMovement : MonoBehaviour
             transform.position = new Vector3(0, -4.1f, 0);
         }
 
+        if (isReduce)
+        {
+            //reduceHp = StartCoroutine(ReduceHp(1.0f));
+            ReduceHpAndResetDimensionGauge();
+        }
+
+        //if (CameraMove.mainCam.orthographic && reduceHp != null)
+        //{
+        //    Debug.Log("HP감소멈춰");
+        //    StopCoroutine(reduceHp);
+        //    reduceHp = null;
+        //}
+
+        curHpText.text = GameManager.instance.GetCurHp().ToString();
+        maxHpText.text = GameManager.instance.GetMaxHp().ToString();
+        dimensionGaugeSlider.value = curDimensionGauge;
+        scoreText.text = "SCORE : " + GameManager.instance.GetScore();
+    }
+
+    void FixedUpdate()
+    {
+        float moveHorizontal = Input.GetAxisRaw("Horizontal");
+        float moveVertical = Input.GetAxisRaw("Vertical");
+
+        CheckIsGrounded();
+        // 바닥에 스치기만해도 점프끝남 - Ray수정
+        animator.SetBool("isGrounded", isGrounded);
 
         // 연속으로 차원 전환하는게 좀 이상한데 몰루
         if (CameraMove.mainCam.orthographic) // 2D일때, 3D에서 2D로 갈때
@@ -169,7 +191,7 @@ public class PlayerMovement : MonoBehaviour
                 // 깡으로 회전넣음
                 if (movement.magnitude != 0)
                     transform.GetChild(2).forward = movement;
-                    //transform.GetChild(2).forward = Vector3.Lerp(transform.GetChild(2).forward, movement, rotateSpeed * Time.deltaTime);
+                //transform.GetChild(2).forward = Vector3.Lerp(transform.GetChild(2).forward, movement, rotateSpeed * Time.deltaTime);
             }
         }
 
@@ -191,31 +213,7 @@ public class PlayerMovement : MonoBehaviour
 
             //if (transform.position.y > jumpMaxY + jumpY)
             //    rb.velocity = new Vector3(rb.velocity.x, -jumpForce / 2, rb.velocity.z);
-        }
 
-        if (isReduce)
-        {
-            //reduceHp = StartCoroutine(ReduceHp(1.0f));
-            ReduceHpAndResetDimensionGauge();
-        }
-
-        //if (CameraMove.mainCam.orthographic && reduceHp != null)
-        //{
-        //    Debug.Log("HP감소멈춰");
-        //    StopCoroutine(reduceHp);
-        //    reduceHp = null;
-        //}
-
-        curHpText.text = GameManager.instance.GetCurHp().ToString();
-        maxHpText.text = GameManager.instance.GetMaxHp().ToString();
-        dimensionGaugeSlider.value = curDimensionGauge;
-        scoreText.text = "SCORE : " + GameManager.instance.GetScore();
-    }
-
-    void FixedUpdate()
-    {
-        if (GameManager.inputEnabled)
-        {
             //Vector3 moveDir = new Vector3(movement.x, 0, movement.z);
             //movement.y = 0;
             //rb.velocity = movement * moveSpeed * Time.fixedDeltaTime;
@@ -223,14 +221,14 @@ public class PlayerMovement : MonoBehaviour
             //rb.velocity = new Vector3(movement.x * moveSpeed,
             //                          rb.velocity.y,
             //                          movement.z * moveSpeed);
-            
+
+            // 왜 갑자기 벽이 전부 뚫리는거지?
+            // https://blog.joe-brothers.com/unity-how-to-prevent-player-going-through-walls-using-raycast/ 이런거라도?
             rb.MovePosition(rb.position + new Vector3(movement.x * moveSpeed * Time.deltaTime,
                             rb.velocity.y * Time.deltaTime,
                             movement.z * moveSpeed * Time.deltaTime));
 
             //rb.AddForce(movement, ForceMode.VelocityChange);
-            
-
         }
     }
 

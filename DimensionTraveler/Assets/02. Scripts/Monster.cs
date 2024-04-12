@@ -121,7 +121,6 @@ public class Monster : MonoBehaviour
 
         yield return new WaitForSeconds(delay);
 
-        // 게임 오브젝트를 삭제합니다.
         Destroy(gameObject);
     }
 

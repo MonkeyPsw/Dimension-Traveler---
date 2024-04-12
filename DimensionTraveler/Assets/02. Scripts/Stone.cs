@@ -55,6 +55,8 @@ public class Stone : MonoBehaviour
             direction.Normalize();
             rb.AddForce(direction * 8.0f, ForceMode.VelocityChange);
 
+            // if (CameraMove.mainCam.orthographic) 조건도 넣어줘야할듯? x축에 힘 0으로 해서
+
             Destroy(gameObject);
         }
     }
