@@ -16,6 +16,7 @@ public class Monster : MonoBehaviour
     public int atk = 1;
     public int score = 100;
     bool isDead = false;
+    public AudioClip monsterSoundClip;
 
     void Start()
     {
@@ -99,8 +100,11 @@ public class Monster : MonoBehaviour
 
     IEnumerator MonsterDead(float delay)
     {
+        if (monsterSoundClip != null)
+            AudioSource.PlayClipAtPoint(monsterSoundClip, transform.position);
+
         // 몬스터의 스케일을 줄입니다.
-        float originalYScale = transform.GetChild(2).localScale.y;
+        float originalYScale = transform.GetChild(0).localScale.y;
         float targetYScale = originalYScale * 0.5f;
         float duration = 0.25f; // 변경에 걸리는 시간
         float elapsed = 0.0f;
@@ -113,8 +117,8 @@ public class Monster : MonoBehaviour
         while (elapsed < duration)
         {
             float newYScale = Mathf.Lerp(originalYScale, targetYScale, elapsed / duration);
-            transform.GetChild(2).localScale =
-                new Vector3(transform.GetChild(2).localScale.x, newYScale, transform.GetChild(2).localScale.z);
+            transform.GetChild(0).localScale =
+                new Vector3(transform.GetChild(0).localScale.x, newYScale, transform.GetChild(0).localScale.z);
             elapsed += Time.deltaTime;
             yield return null;
         }
@@ -160,7 +164,12 @@ public class Monster : MonoBehaviour
 
                 Vector3 direction = collision.transform.position - transform.position;
                 direction.y = 0;
+
+                if (CameraMove.mainCam.orthographic)
+                    direction.x = 0;
+
                 direction.Normalize();
+
                 //rb.velocity = direction * 5.0f;
                 rb.AddForce(direction * 5.0f, ForceMode.VelocityChange);
 

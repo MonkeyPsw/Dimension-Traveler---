@@ -402,9 +402,10 @@ GameObject:
   - component: {fileID: 1018623682956739897}
   - component: {fileID: 5303611836666266503}
   - component: {fileID: 446327956000208667}
+  - component: {fileID: -8260289249940714553}
   m_Layer: 0
   m_Name: Treasure
-  m_TagString: Treasure
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -508,3 +509,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 372dc8dcc904b3d479016db91a6bec74, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &-8260289249940714553
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9192371093310881603}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 81c082e0d024f7441bcd2da8827166e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemType: 1
+  ItemEffectPrefab: {fileID: 1260423131620925318, guid: 6336e3d27a88320408d168672aeacdd1, type: 3}
+  ItemSoundClip: {fileID: 8300000, guid: 333e03df79b422b46be787c6418c652e, type: 3}

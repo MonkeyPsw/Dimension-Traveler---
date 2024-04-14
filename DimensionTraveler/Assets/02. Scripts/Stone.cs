@@ -6,10 +6,18 @@ public class Stone : MonoBehaviour
 {
     Vector3 stoneOriPos;
     bool isCenter = false;
+    public AudioClip stoneSoundClip;
+    public AudioClip stoneBreakSoundClip;
+    bool isStone = true;
 
     void Start()
     {
         stoneOriPos = transform.position;
+    }
+
+    void Update()
+    {
+        
     }
 
     void LateUpdate()
@@ -52,12 +60,25 @@ public class Stone : MonoBehaviour
 
             Vector3 direction = collision.transform.position - transform.position;
             direction.y = 0;
+
+            // 2D 조건도 넣어줘야할듯? x축에 힘 0으로 해서
+            if (CameraMove.mainCam.orthographic)
+                direction.x = 0;
+
             direction.Normalize();
+
             rb.AddForce(direction * 8.0f, ForceMode.VelocityChange);
-
-            // if (CameraMove.mainCam.orthographic) 조건도 넣어줘야할듯? x축에 힘 0으로 해서
-
+            AudioSource.PlayClipAtPoint(stoneBreakSoundClip, transform.position);
             Destroy(gameObject);
+        }
+
+        if (collision.gameObject.CompareTag("Ground"))
+        {
+            if (stoneSoundClip != null && isStone)
+            {
+                AudioSource.PlayClipAtPoint(stoneSoundClip, transform.position);
+                isStone = false;
+            }
         }
     }
 

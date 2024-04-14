@@ -7,19 +7,7 @@ TagManager:
   - Ground
   - Block
   - Wall
-  - Mountain
-  - Head
   - Monster
-  - Coin
-  - Foot
-  - Treasure
-  - SmallHealKit
-  - BigHealKit
-  - Potion
-  - MonsterHead
-  - Orb
-  - Portal
-  - Stone
   layers:
   - Default
   - TransparentFX

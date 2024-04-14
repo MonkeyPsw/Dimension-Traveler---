@@ -14,14 +14,29 @@ public class GameManager : MonoBehaviour
     Canvas canvas;
     GameObject pausePanel;
     bool isPaused = false;
+    public GameObject gameOverPanel;
 
     int curHp = 10;
     int maxHp = 10;
     int score = 0;
 
-    //public Collider[] colliders;
+    int tmpCurHp;
+    int tmpMaxHp;
+    int tmpScore;
+    bool isReload = false;
+    bool isDim;
+
+    public GameObject startEffectPrefab;
+    public GameObject transitionEffectPrefab;
+    public float transitionDuration = 2.0f;
+    public AudioClip transitionSound;
+    public AudioClip dimensionChangeSound;
 
     public static GameManager instance;
+    AudioSource audioSource;
+    public GameObject bgm;
+    public AudioClip pauseSound;
+    public AudioClip gameOverSound;
 
     private void Awake()
     {
@@ -29,14 +44,14 @@ public class GameManager : MonoBehaviour
         {
             instance = this;
 
+            SceneManager.sceneLoaded += OnSceneLoaded;
+
             canvas = FindObjectOfType<Canvas>();
             if (canvas != null)
             {
                 pausePanel = canvas.transform.Find("PausePanel")?.gameObject;
                 if (pausePanel != null)
-                {
                     pausePanel.SetActive(false);
-                }
             }
         }
         else if (instance != this)
@@ -45,13 +60,39 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        inputEnabled = false;
+        StartCoroutine(EnableInputAfterDelay(inputDelay + 1.0f));
+
+        GameObject loadingEffect = Instantiate(startEffectPrefab, new Vector3(0, -4.1f, 0), Quaternion.identity);
+        if (transitionSound != null)
+            AudioSource.PlayClipAtPoint(transitionSound, transform.position);
+        Destroy(loadingEffect, transitionDuration);
+
+        // 씬이 로드될 때마다 현재 값들을 임시 변수에 저장
+        tmpCurHp = curHp;
+        tmpMaxHp = maxHp;
+        tmpScore = score;
+        isDim = PlayerMovement.isDimension;
+    }
+
     void Start()
     {
-        
+        audioSource = GetComponent<AudioSource>();
     }
 
     void Update()
     {
+        if (isReload)
+        {
+            curHp = tmpCurHp;
+            maxHp = tmpMaxHp;
+            score = tmpScore;
+            PlayerMovement.isDimension = isDim;
+            isReload = false;
+        }
+
         if (inputEnabled && !isPaused && PlayerMovement.isDimension)
         {
             if (Input.GetKeyDown(KeyCode.LeftShift) && PlayerMovement.isGrounded)
@@ -72,6 +113,7 @@ public class GameManager : MonoBehaviour
     public void SetDimension()
     {
         CameraMove.ChangeDimension();
+        audioSource.PlayOneShot(dimensionChangeSound);
         PlayerMovement.isChange = true;
         inputEnabled = false; // 입력 비활성화
         StartCoroutine(EnableInputAfterDelay(inputDelay)); // 입력 딜레이 후에 다시 활성화
@@ -117,9 +159,26 @@ public class GameManager : MonoBehaviour
     
     public void TogglePause()
     {
+        audioSource.PlayOneShot(pauseSound);
         isPaused = !isPaused;
+
+        if (isPaused)
+            bgm.GetComponent<AudioSource>().Pause();
+        else
+            bgm.GetComponent<AudioSource>().UnPause();
+
         Time.timeScale = isPaused ? 0 : 1.0f;
         pausePanel.SetActive(isPaused);
+    }
+
+    public void GameOver()
+    {
+        bgm.GetComponent<AudioSource>().Pause();
+        audioSource.PlayOneShot(gameOverSound);
+        isPaused = true;
+
+        Time.timeScale = 0;
+        gameOverPanel.SetActive(isPaused);
     }
 
     public void AddScore(int score)
@@ -157,13 +216,30 @@ public class GameManager : MonoBehaviour
         return maxHp;
     }
 
-    public static void LoadNextMap()
+    public static void LoadNextMap(Vector3 Pos)
     {
+        instance.PlayTransitionEffect(Pos);
+    }
+
+    public void PlayTransitionEffect(Vector3 Pos)
+    {
+        StartCoroutine(EnableInputAfterDelay(inputDelay));
+
+        GameObject transitionEffect = Instantiate(transitionEffectPrefab, Pos, Quaternion.identity);
+        Destroy(transitionEffect, transitionDuration);
+
+        StartCoroutine(LoadMapAfterDelay(transitionDuration));
+    }
+
+    IEnumerator LoadMapAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
         SceneManager.LoadScene(level);
     }
 
     public void ReLoadCurrentMap()
     {
+        isReload = true;
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
 
         Canvas canvas = FindObjectOfType<Canvas>();
@@ -174,6 +250,12 @@ public class GameManager : MonoBehaviour
             {
                 pausePanel.SetActive(false);
                 TogglePause();
+            }
+            if (gameOverPanel != null)
+            {
+                isPaused = false;
+                Time.timeScale = 1.0f;
+                gameOverPanel.SetActive(isPaused);
             }
         }
     }

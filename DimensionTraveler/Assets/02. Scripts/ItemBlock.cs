@@ -5,11 +5,15 @@ using UnityEngine;
 public class ItemBlock : MonoBehaviour
 {
     public Material emptyMaterial;
+    public AudioClip ItemSoundClip;
+    public AudioClip EmptySoundClip;
     public GameObject itemPrefab;
-    
+    public GameObject markPrefab;
+
     GameObject item;
     Vector3 itemPos;
     bool isItem = false;
+
     Vector3 oriPos;
 
     void Start()
@@ -57,6 +61,7 @@ public class ItemBlock : MonoBehaviour
         // 원래 위치로 정확히 맞추기
         transform.position = oriPos;
     }
+
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.CompareTag("Player"))
@@ -71,8 +76,18 @@ public class ItemBlock : MonoBehaviour
                     {
                         itemPos = new Vector3(transform.position.x, transform.position.y + 1.0f, transform.position.z);
                         item = Instantiate(itemPrefab, itemPos, Quaternion.identity);
+                        if (ItemSoundClip != null)
+                            AudioSource.PlayClipAtPoint(ItemSoundClip, transform.position);
                         isItem = true;
+
                         gameObject.GetComponentInChildren<Renderer>().material = emptyMaterial;
+                        markPrefab.SetActive(false);
+                        break;
+                    }
+                    else
+                    {
+                        if (EmptySoundClip != null)
+                            AudioSource.PlayClipAtPoint(EmptySoundClip, transform.position);
                         break;
                     }
                 }

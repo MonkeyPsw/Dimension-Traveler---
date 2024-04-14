@@ -13,9 +13,10 @@ GameObject:
   - component: {fileID: 7747181915185185292}
   - component: {fileID: 1180197980707529532}
   - component: {fileID: 821824405672474227}
+  - component: {fileID: -5931048448995476364}
   m_Layer: 0
   m_Name: Coin
-  m_TagString: Coin
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -119,6 +120,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 372dc8dcc904b3d479016db91a6bec74, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &-5931048448995476364
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3222127083702545952}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 81c082e0d024f7441bcd2da8827166e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemType: 0
+  ItemEffectPrefab: {fileID: 1260423131620925318, guid: 6336e3d27a88320408d168672aeacdd1, type: 3}
+  ItemSoundClip: {fileID: 8300000, guid: 333e03df79b422b46be787c6418c652e, type: 3}
 --- !u!1001 &2870973881879988036
 PrefabInstance:
   m_ObjectHideFlags: 0

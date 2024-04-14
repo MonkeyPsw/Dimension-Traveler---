@@ -13,9 +13,10 @@ GameObject:
   - component: {fileID: 1879705117264924659}
   - component: {fileID: 2527887356263004457}
   - component: {fileID: 1446583417655062098}
+  - component: {fileID: -2356321936045364278}
   m_Layer: 0
   m_Name: Portal
-  m_TagString: Portal
+  m_TagString: Untagged
   m_Icon: {fileID: 7250588514170254948, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -4888,6 +4889,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: de363b9f02eb35c48b52436828f3377e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &-2356321936045364278
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 600766093468079512}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 81c082e0d024f7441bcd2da8827166e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemType: 6
+  ItemEffectPrefab: {fileID: 5489657006927061221, guid: dd38d60ff4a032b4b85ef9f7aa02a2b2, type: 3}
+  ItemSoundClip: {fileID: 8300000, guid: 324f01c48aaa7044b894eedf6a46da70, type: 3}
 --- !u!1 &1312775068491296560
 GameObject:
   m_ObjectHideFlags: 0

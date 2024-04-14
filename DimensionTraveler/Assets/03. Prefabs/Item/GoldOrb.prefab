@@ -19374,9 +19374,10 @@ GameObject:
   - component: {fileID: 1844406519083884378}
   - component: {fileID: 8263525002255489899}
   - component: {fileID: 4833746023786446674}
+  - component: {fileID: -7342243521938310793}
   m_Layer: 0
   m_Name: GoldOrb
-  m_TagString: Orb
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -24342,3 +24343,18 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.5, y: 0.5, z: 0.5}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &-7342243521938310793
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7667623548267917154}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 81c082e0d024f7441bcd2da8827166e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  itemType: 5
+  ItemEffectPrefab: {fileID: 1260423131620925318, guid: 6336e3d27a88320408d168672aeacdd1, type: 3}
+  ItemSoundClip: {fileID: 8300000, guid: 7ee32178cb96666469930a1418e06500, type: 3}

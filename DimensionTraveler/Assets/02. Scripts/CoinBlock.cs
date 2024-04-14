@@ -6,11 +6,15 @@ public class CoinBlock : MonoBehaviour
 {
     public Material emptyMaterial;
     //public Texture emptyTexture;
+    public AudioClip CoinSoundClip;
+    public AudioClip EmptySoundClip;
     public GameObject coinPrefab;
+    public GameObject markPrefab;
 
     GameObject coin;
     Vector3 coinPos;
     bool isCoin = false;
+
     Vector3 oriPos;
 
     void Start()
@@ -74,9 +78,19 @@ public class CoinBlock : MonoBehaviour
                     {
                         coinPos = new Vector3(transform.position.x, transform.position.y + 1.0f, transform.position.z);
                         coin = Instantiate(coinPrefab, coinPos, Quaternion.identity);
+                        if (CoinSoundClip != null)
+                            AudioSource.PlayClipAtPoint(CoinSoundClip, transform.position);
                         // 코인 자동 삭제할지 고민, 자동삭제하면 업데이트문 주석처리
                         isCoin = true;
+
                         gameObject.GetComponentInChildren<Renderer>().material = emptyMaterial;
+                        markPrefab.SetActive(false);
+                        break;
+                    }
+                    else
+                    {
+                        if (EmptySoundClip != null)
+                            AudioSource.PlayClipAtPoint(EmptySoundClip, transform.position);
                         break;
                     }
                 }

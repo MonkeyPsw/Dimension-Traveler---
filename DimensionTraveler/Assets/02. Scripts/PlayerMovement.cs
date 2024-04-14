@@ -27,7 +27,7 @@ public class PlayerMovement : MonoBehaviour
     public static bool isDimension = false; // 1_1 차원 전환 아이템 소지 여부
     float maxDimensionGauge = 10.0f;
     public float curDimensionGauge = 10.0f;
-    public float preDimensionGauge = 10.0f;
+    //public float preDimensionGauge = 10.0f;
     public static bool isChange = false;
     public LayerMask targetLayer; // 충돌을 감지할 레이어
     public float collisionThreshold = 1.0f; // 절반 이상 충돌되었다고 판단할 기준값
@@ -47,12 +47,30 @@ public class PlayerMovement : MonoBehaviour
     //float rotateSpeed = 20.0f;
     public GameObject playerSkinPrefab;
 
+    AudioSource audioSource;
+
+    public AudioClip footStepSound;
+    public float footstepInterval = 1.5f;
+    private float lastFootstepTime;
+
+    public AudioClip jumpSound;
+    public AudioClip hitSound;
+    public AudioClip overDimensionSound;
+    bool isFall = false;
+    public AudioClip fallSound;
+
+    bool isGameOver = false;
+
     void Start()
     {
         rb = GetComponent<Rigidbody>();
         animator = GetComponentInChildren<Animator>();
+        audioSource = GetComponent<AudioSource>();
 
-        //if (GameManager.level > 2)
+        transform.GetChild(2).localRotation = Quaternion.Euler(0, 90, 0);
+        animator.SetTrigger("isStart");
+
+        if (GameManager.level > 2)
             isDimension = true;
 
         //for (int i = 0; i < (int)maxDimensionGauge; i++)
@@ -64,16 +82,30 @@ public class PlayerMovement : MonoBehaviour
         curHpText = GameObject.Find("CurHP").GetComponent<TextMeshProUGUI>();
         maxHpText = GameObject.Find("MaxHP").GetComponent<TextMeshProUGUI>();
         dimensionGaugeSlider = GameObject.Find("DimensionGaugeSlider").GetComponent<Slider>();
-        scoreText = GameObject.Find("Score").GetComponent<TextMeshProUGUI>();
+        scoreText = GameObject.Find("ScoreText").GetComponent<TextMeshProUGUI>();
     }
 
     void Update()
     {
+        if (GameManager.inputEnabled)
+        {
+            isFall = false;
+            if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
+            {
+                jumpY = transform.position.y;
+                Jump(jumpForce);
+            }
+        }
 
         if (GameManager.instance.GetCurHp() <= 0)
         {
             GameManager.instance.SetCurHp(0);
             Debug.Log("게임종료");
+            if (!isGameOver)
+            {
+                GameManager.instance.GameOver();
+                isGameOver = true;
+            }
             //return;
         }
 
@@ -86,27 +118,37 @@ public class PlayerMovement : MonoBehaviour
             gameObject.layer = 7;
 
         // 추락
-        if (transform.position.y < -10)
+        if (!isFall && transform.position.y < -10)
         {
-            GameManager.instance.AddCurHp(-3);
-            StartCoroutine(InputDelayAndToggleGod(2.0f));
+            Debug.Log("추락");
+            isFall = true;
+            audioSource.PlayOneShot(fallSound);
+            //transform.position = new Vector3(0, -4.1f, 0);
             animator.SetTrigger("isDrop");
             animator.SetFloat("Move", 0);
+            GameManager.instance.AddCurHp(-3);
+            StartCoroutine(InputDelayAndToggleGod(2.0f));
+        }
+
+        if (transform.position.y < -10)
+        {
             transform.position = new Vector3(0, -4.1f, 0);
         }
 
         if (isReduce)
         {
-            //reduceHp = StartCoroutine(ReduceHp(1.0f));
             ReduceHpAndResetDimensionGauge();
         }
 
-        //if (CameraMove.mainCam.orthographic && reduceHp != null)
-        //{
-        //    Debug.Log("HP감소멈춰");
-        //    StopCoroutine(reduceHp);
-        //    reduceHp = null;
-        //}
+        if (GameManager.inputEnabled && movement.magnitude != 0 && isGrounded)
+        {
+            if (Time.time - lastFootstepTime > footstepInterval)
+            {
+                //AudioSource.PlayClipAtPoint(footStepSound, transform.position);
+                audioSource.PlayOneShot(footStepSound);
+                lastFootstepTime = Time.time;
+            }
+        }
 
         curHpText.text = GameManager.instance.GetCurHp().ToString();
         maxHpText.text = GameManager.instance.GetMaxHp().ToString();
@@ -146,7 +188,7 @@ public class PlayerMovement : MonoBehaviour
 
             // 2초뒤에 x좌표를 0으로 옮겨서 가운데에서만 이동하게끔
             if (is2D)
-                StartCoroutine(MoveToCenterWithDelay(2.0f));
+                StartCoroutine(MoveToCenterWithDelay(1.9f));
 
             // Orthographic 2D일 때는 좌우키로 z축 이동
             movement = new Vector3(0f, 0f, moveHorizontal).normalized;
@@ -205,11 +247,11 @@ public class PlayerMovement : MonoBehaviour
             // 그냥 마리오처럼 가속을 받는게 좋을까?
             // 나는 그냥 이동하는게 좋은데.
 
-            if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
-            {
-                jumpY = transform.position.y;
-                Jump(jumpForce);
-            }
+            //if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
+            //{
+            //    jumpY = transform.position.y;
+            //    Jump(jumpForce);
+            //}
 
             //if (transform.position.y > jumpMaxY + jumpY)
             //    rb.velocity = new Vector3(rb.velocity.x, -jumpForce / 2, rb.velocity.z);
@@ -248,6 +290,8 @@ public class PlayerMovement : MonoBehaviour
         if (canJump)
         {
             rb.AddForce(new Vector3(0, force, 0f));
+            //AudioSource.PlayClipAtPoint(jumpSound, transform.position);
+            audioSource.PlayOneShot(jumpSound);
             isGrounded = false;
             canJump = false;
             StartCoroutine(JumpCool(0.5f));
@@ -384,6 +428,7 @@ public class PlayerMovement : MonoBehaviour
     public void ReduceHpAndResetDimensionGauge()
     {
         GameManager.instance.AddCurHp(-1);
+        audioSource.PlayOneShot(overDimensionSound);
         curDimensionGauge = maxDimensionGauge / 2;
         isReduce = false;
     }
@@ -410,6 +455,7 @@ public class PlayerMovement : MonoBehaviour
         isWallCenter = true;
     }
 
+    // 무한충돌문제가 간혹 생기는데 몰루
     IEnumerator InputDelayAndToggleGod(float delay)
     {
         GameManager.inputEnabled = false;
@@ -449,6 +495,8 @@ public class PlayerMovement : MonoBehaviour
     public void HitMonster(float time)
     {
         animator.SetTrigger("Hit");
+        //AudioSource.PlayClipAtPoint(hitSound, transform.position);
+        audioSource.PlayOneShot(hitSound);
         StartCoroutine(InputDelayAndToggleGod(time));
     }
 
@@ -458,7 +506,7 @@ public class PlayerMovement : MonoBehaviour
 
         Vector3[] raycastOrigins = new Vector3[9];
         float offsetX = 0.14f;
-        float offsetZ = 0.14f;
+        float offsetZ = 0.16f;
         bool isRay = false;
 
         // 3D 기준
@@ -491,7 +539,9 @@ public class PlayerMovement : MonoBehaviour
         }
 
         if (!isRay)
+        {
             isGrounded = false;
+        }
 
         //Debug.DrawRay(transform.position + offset, Vector3.down * raycastDistance, Color.black);
         //Debug.DrawRay(transform.position - offset, Vector3.down * raycastDistance, Color.black);
@@ -543,86 +593,5 @@ public class PlayerMovement : MonoBehaviour
             }
         }
     }
-
-    //private void OnCollisionStay(Collision collision)
-    //{
-    //    if (collision.gameObject.CompareTag("Ground") || collision.gameObject.CompareTag("Wall"))
-    //    {
-    //        isGrounded = true;
-
-    //        if (collision.gameObject.CompareTag("Wall"))
-    //        {
-    //            // 2개 이상의 Wall에 닿을때 문제가 있긴함
-    //            wallPos = collision.gameObject.GetComponent<Wall>().GetWallOriPos();
-    //        }
-    //    }
-
-    //}
-
-    private void OnCollisionExit(Collision collision)
-    {
-        //if (collision.gameObject.CompareTag("Ground"))
-        //{
-        //    wallPos.x = 0;
-        //}
-
-    }
-
-    private void OnTriggerEnter(Collider other)
-    {
-        if (other.gameObject.CompareTag("Coin"))
-        {
-            GameManager.instance.AddScore(100);
-            Destroy(other.gameObject);
-        }
-
-        if (other.gameObject.CompareTag("Treasure"))
-        {
-            GameManager.instance.AddScore(1000);
-            Destroy(other.gameObject);
-        }
-
-        if (other.gameObject.CompareTag("SmallHealKit"))
-        {
-            GameManager.instance.AddCurHp(1);
-            Destroy(other.gameObject);
-        }
-
-        if (other.gameObject.CompareTag("BigHealKit"))
-        {
-            GameManager.instance.AddCurHp(5);
-            Destroy(other.gameObject);
-        }
-
-        if (other.gameObject.CompareTag("Potion"))
-        {
-            GameManager.instance.AddMaxHp(1);
-            GameManager.instance.AddCurHp(1);
-            Destroy(other.transform.gameObject);
-        }
-
-        //if (other.gameObject.CompareTag("MonsterHead"))
-        //{
-        //    //rb.AddForce(new Vector3(0, jumpForce * 0.7f, 0f));
-        //    rb.velocity = new Vector3(rb.velocity.x, jumpForce * 0.012f, rb.velocity.z);
-        //    Destroy(other.transform.parent.gameObject);
-        //    AddScore(100);
-        //}
-
-        if (other.gameObject.CompareTag("Orb"))
-        {
-            isDimension = true;
-            Destroy(other.transform.gameObject);
-        }
-
-        // 수정필요
-        // 포탈 옆에서 차원전환시 로드 실패?
-        if (other.gameObject.CompareTag("Portal"))
-        {
-            GameManager.level++;
-            GameManager.LoadNextMap();
-        }
-    }
-
 
 }
