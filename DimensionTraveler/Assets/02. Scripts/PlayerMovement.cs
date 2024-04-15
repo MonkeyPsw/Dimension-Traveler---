@@ -70,7 +70,7 @@ public class PlayerMovement : MonoBehaviour
         transform.GetChild(2).localRotation = Quaternion.Euler(0, 90, 0);
         animator.SetTrigger("isStart");
 
-        if (GameManager.level > 2)
+        //if (GameManager.level > 2)
             isDimension = true;
 
         //for (int i = 0; i < (int)maxDimensionGauge; i++)
@@ -79,6 +79,11 @@ public class PlayerMovement : MonoBehaviour
         //    gauge.transform.parent = dimensionGaugeParent.transform;
         //}
 
+        TextInit();
+    }
+
+    void TextInit()
+    {
         curHpText = GameObject.Find("CurHP").GetComponent<TextMeshProUGUI>();
         maxHpText = GameObject.Find("MaxHP").GetComponent<TextMeshProUGUI>();
         dimensionGaugeSlider = GameObject.Find("DimensionGaugeSlider").GetComponent<Slider>();
@@ -87,6 +92,11 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
+        if (curHpText == null)
+        {
+            TextInit();
+        }
+
         if (GameManager.inputEnabled)
         {
             isFall = false;

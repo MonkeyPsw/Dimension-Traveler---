@@ -17,6 +17,8 @@ public class Monster : MonoBehaviour
     public int score = 100;
     bool isDead = false;
     public AudioClip monsterSoundClip;
+    float lastAtkTime;
+    float atkInterval = 0.5f;
 
     void Start()
     {
@@ -130,11 +132,11 @@ public class Monster : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.CompareTag("Wall"))
-        {
-            gameObject.GetComponent<Rigidbody>().isKinematic = true;
-            isWall = true;
-        }
+        //if (collision.gameObject.CompareTag("Wall"))
+        //{
+        //    gameObject.GetComponent<Rigidbody>().isKinematic = true;
+        //    isWall = true;
+        //}
 
         if (collision.gameObject.CompareTag("Player") && GameManager.inputEnabled)
         {
@@ -160,7 +162,12 @@ public class Monster : MonoBehaviour
                 Debug.Log("몬스터충돌");
                 player.HitMonster(0.5f);
                 //StartCoroutine(InputDelayAndToggleGod(0.5f));
-                GameManager.instance.AddCurHp(-atk);
+                if (Time.time - lastAtkTime > atkInterval)
+                {
+                    GameManager.instance.AddCurHp(-atk);
+                    lastAtkTime = Time.time;
+                }
+                
 
                 Vector3 direction = collision.transform.position - transform.position;
                 direction.y = 0;

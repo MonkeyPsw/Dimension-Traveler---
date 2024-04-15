@@ -34,12 +34,19 @@ public class GameManager : MonoBehaviour
 
     public static GameManager instance;
     AudioSource audioSource;
+    public AudioClip openingBGM;
     public GameObject bgm;
     public AudioClip pauseSound;
     public AudioClip gameOverSound;
 
     private void Awake()
     {
+        inputEnabled = false;
+        foreach (GameObject obj in DontDestroy.dontDestroyListObj)
+        {
+            obj.SetActive(true);
+        }
+
         if (instance == null)
         {
             instance = this;
@@ -53,6 +60,7 @@ public class GameManager : MonoBehaviour
                 if (pausePanel != null)
                     pausePanel.SetActive(false);
             }
+
         }
         else if (instance != this)
         {
@@ -62,7 +70,6 @@ public class GameManager : MonoBehaviour
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        inputEnabled = false;
         StartCoroutine(EnableInputAfterDelay(inputDelay + 1.0f));
 
         GameObject loadingEffect = Instantiate(startEffectPrefab, new Vector3(0, -4.1f, 0), Quaternion.identity);
@@ -225,6 +232,9 @@ public class GameManager : MonoBehaviour
     {
         StartCoroutine(EnableInputAfterDelay(inputDelay));
 
+        //if (!Camera.main.orthographic)
+        //    SetDimension();
+
         GameObject transitionEffect = Instantiate(transitionEffectPrefab, Pos, Quaternion.identity);
         Destroy(transitionEffect, transitionDuration);
 
@@ -239,6 +249,10 @@ public class GameManager : MonoBehaviour
 
     public void ReLoadCurrentMap()
     {
+        if (audioSource.isPlaying)
+        {
+            audioSource.Stop();
+        }
         isReload = true;
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
 
@@ -260,8 +274,30 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void QuitGame()
+    public void InitValue()
     {
-        Application.Quit();
+        curHp = 10;
+        maxHp = 10;
+        score = 0;
+        level = 2;
+        PlayerMovement.isDimension = false;
+
+        tmpCurHp = curHp;
+        tmpMaxHp = maxHp;
+        tmpScore = score;
+    }
+
+    public void PanelHide()
+    {
+        TogglePause();
+        gameOverPanel.SetActive(false);
+        Time.timeScale = 1.0f;
+    }
+
+    public void BackToMenu()
+    {
+        PanelHide();
+        InitValue();
+        SceneManager.LoadScene(1);
     }
 }

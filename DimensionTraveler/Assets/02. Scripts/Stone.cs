@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class Stone : MonoBehaviour
 {
@@ -9,15 +10,20 @@ public class Stone : MonoBehaviour
     public AudioClip stoneSoundClip;
     public AudioClip stoneBreakSoundClip;
     bool isStone = true;
+    AudioSource audioSource;
 
     void Start()
     {
         stoneOriPos = transform.position;
+        audioSource = GetComponent<AudioSource>();
     }
 
     void Update()
     {
-        
+        if (transform.position.y < -7.5f)
+        {
+            Destroy(gameObject);
+        }
     }
 
     void LateUpdate()
@@ -67,8 +73,12 @@ public class Stone : MonoBehaviour
 
             direction.Normalize();
 
+            //AudioSource.PlayClipAtPoint(stoneBreakSoundClip, transform.position);
+            audioSource.clip = stoneBreakSoundClip;
+            audioSource.volume = 1.0f;
+            audioSource.Play();
+
             rb.AddForce(direction * 8.0f, ForceMode.VelocityChange);
-            AudioSource.PlayClipAtPoint(stoneBreakSoundClip, transform.position);
             Destroy(gameObject);
         }
 
@@ -76,7 +86,12 @@ public class Stone : MonoBehaviour
         {
             if (stoneSoundClip != null && isStone)
             {
-                AudioSource.PlayClipAtPoint(stoneSoundClip, transform.position);
+                //AudioSource.PlayClipAtPoint(stoneSoundClip, transform.position);
+                audioSource.clip = stoneSoundClip;
+                audioSource.volume = 0.5f;
+                audioSource.Play();
+                if (Time.timeScale == 0)
+                    audioSource.Stop();
                 isStone = false;
             }
         }
