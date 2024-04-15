@@ -24,6 +24,17 @@ public class Stone : MonoBehaviour
         {
             Destroy(gameObject);
         }
+
+        //if (!GameManager.inputEnabled)
+        //    GetComponent<Rigidbody>().isKinematic = true;
+        //else
+        //    GetComponent<Rigidbody>().isKinematic = false;
+
+
+        if (Time.timeScale == 0)
+            audioSource.Pause();
+        else
+            audioSource.UnPause();
     }
 
     void LateUpdate()
@@ -90,10 +101,14 @@ public class Stone : MonoBehaviour
                 audioSource.clip = stoneSoundClip;
                 audioSource.volume = 0.5f;
                 audioSource.Play();
-                if (Time.timeScale == 0)
-                    audioSource.Stop();
                 isStone = false;
             }
+        }
+
+        if (collision.gameObject.CompareTag("Stone"))
+        {
+            Destroy(gameObject);
+            Destroy(collision.gameObject);
         }
     }
 

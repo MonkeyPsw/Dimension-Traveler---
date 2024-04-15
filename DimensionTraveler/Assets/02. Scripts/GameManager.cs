@@ -8,7 +8,7 @@ using UnityEngine.SceneManagement;
 public class GameManager : MonoBehaviour
 {
     public static bool inputEnabled = true;
-    public static int level = 2; // 0:오프닝, 1:메인메뉴, 2:맵1_1, ...
+    public static int level = 2; // 0:오프닝, 1:메인메뉴, 2:맵1_1, ... // 기본 2
     float inputDelay = 2.0f; // 입력 딜레이 시간
 
     Canvas canvas;
@@ -70,18 +70,28 @@ public class GameManager : MonoBehaviour
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        StartCoroutine(EnableInputAfterDelay(inputDelay + 1.0f));
+        if (gameObject.activeSelf)
+        {
+            // 이 조건 되는건가 몰루
+            if (SceneManager.GetActiveScene().buildIndex != SceneManager.sceneCountInBuildSettings)
+            {
+                StartCoroutine(EnableInputAfterDelay(inputDelay + 1.0f));
 
-        GameObject loadingEffect = Instantiate(startEffectPrefab, new Vector3(0, -4.1f, 0), Quaternion.identity);
-        if (transitionSound != null)
-            AudioSource.PlayClipAtPoint(transitionSound, transform.position);
-        Destroy(loadingEffect, transitionDuration);
+                GameObject loadingEffect = Instantiate(startEffectPrefab, new Vector3(0, -4.1f, 0), Quaternion.identity);
+                if (transitionSound != null)
+                    AudioSource.PlayClipAtPoint(transitionSound, transform.position);
+                Destroy(loadingEffect, transitionDuration);
+            }
+        }
+        else
+            InitValue();
 
         // 씬이 로드될 때마다 현재 값들을 임시 변수에 저장
         tmpCurHp = curHp;
         tmpMaxHp = maxHp;
         tmpScore = score;
         isDim = PlayerMovement.isDimension;
+
     }
 
     void Start()
@@ -300,4 +310,15 @@ public class GameManager : MonoBehaviour
         InitValue();
         SceneManager.LoadScene(1);
     }
+
+    public void BackToTitle()
+    {
+        InitValue();
+        SceneManager.LoadScene(0);
+    }
+
+    //private void OnDestroy()
+    //{
+    //    instance = null;
+    //}
 }

@@ -61,6 +61,11 @@ public class PlayerMovement : MonoBehaviour
 
     bool isGameOver = false;
 
+    private void Awake()
+    {
+        GameManager.inputEnabled = false;
+    }
+
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -70,7 +75,7 @@ public class PlayerMovement : MonoBehaviour
         transform.GetChild(2).localRotation = Quaternion.Euler(0, 90, 0);
         animator.SetTrigger("isStart");
 
-        //if (GameManager.level > 2)
+        if (GameManager.level > 2)
             isDimension = true;
 
         //for (int i = 0; i < (int)maxDimensionGauge; i++)
@@ -162,6 +167,10 @@ public class PlayerMovement : MonoBehaviour
 
         curHpText.text = GameManager.instance.GetCurHp().ToString();
         maxHpText.text = GameManager.instance.GetMaxHp().ToString();
+        if (isDimension)
+            dimensionGaugeSlider.fillRect.GetComponent<Image>().color = Color.red;
+        else
+            dimensionGaugeSlider.fillRect.GetComponent<Image>().color = Color.black;
         dimensionGaugeSlider.value = curDimensionGauge;
         scoreText.text = "SCORE : " + GameManager.instance.GetScore();
     }
@@ -465,7 +474,7 @@ public class PlayerMovement : MonoBehaviour
         isWallCenter = true;
     }
 
-    // 무한충돌문제가 간혹 생기는데 몰루
+    // 무한충돌문제가 간혹 생기는데 몰루 - 몬스터에 공격주기 넣어서 해결
     IEnumerator InputDelayAndToggleGod(float delay)
     {
         GameManager.inputEnabled = false;

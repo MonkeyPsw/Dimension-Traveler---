@@ -9,12 +9,11 @@ public class PressShiftKey : MonoBehaviour
     private float alpha = 1.0f;
     private int mode = 0;
 
-    // Start is called before the first frame update
     private void Start()
     {
+
     }
 
-    // Update is called once per frame
     private void Update()
     {
         if (mode == 0)

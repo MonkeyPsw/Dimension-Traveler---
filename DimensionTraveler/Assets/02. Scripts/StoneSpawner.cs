@@ -19,6 +19,7 @@ public class StoneSpawner : MonoBehaviour
         // 랜덤한 위치 인덱스 선택
         int randomIndex = Random.Range(0, spawnPoints.Length);
         // 선택된 위치에 Stone 생성
-        Instantiate(stonePrefab, spawnPoints[randomIndex].position, Quaternion.identity);
+        if (GameManager.inputEnabled)
+            Instantiate(stonePrefab, spawnPoints[randomIndex].position, Quaternion.identity);
     }
 }

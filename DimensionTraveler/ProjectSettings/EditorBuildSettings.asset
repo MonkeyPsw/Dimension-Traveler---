@@ -10,7 +10,7 @@ EditorBuildSettings:
     guid: a67ad8a1dff083f408c9eff574e9b298
   - enabled: 1
     path: Assets/01. Scenes/MainMenu.unity
-    guid: 35e71a94b4e54894d8835d6c7b236e09
+    guid: 7a5978fd89bb7dd4da12acd8e3ae6381
   - enabled: 1
     path: Assets/01. Scenes/Game_1_1.unity
     guid: 68367099f45049e41807009db466569e
@@ -25,5 +25,5 @@ EditorBuildSettings:
     guid: a821591536e9fe145931ded9a8285d53
   - enabled: 1
     path: Assets/01. Scenes/Ending.unity
-    guid: 2b573448c62fb0849a4177d57cc9a9c3
+    guid: 7037b69a7db8d9d44881d8708b5616d5
   m_configObjects: {}

@@ -26,6 +26,8 @@ public class NextScene : MonoBehaviour
         if (nextSceneIndex == SceneManager.sceneCountInBuildSettings)
         {
             nextSceneIndex = 0;
+            GameManager.level = 2;
+            //PlayerMovement.isDimension = false;
         }
 
         // 다음 씬을 로드합니다.
