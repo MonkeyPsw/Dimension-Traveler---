@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.66621685, g: 0.8827709, b: 0.8857476, a: 1}
+  m_IndirectSpecularColor: {r: 0.6266231, g: 0.8307843, b: 0.8336302, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -5305,6 +5305,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   text: {fileID: 900450872}
+  tutorialPanel: {fileID: 0}
 --- !u!114 &900450875
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5570,7 +5571,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: DIMENSION TREVELER
+  m_Text: DIMENSION TRAVELER
 --- !u!222 &1583684192
 CanvasRenderer:
   m_ObjectHideFlags: 0
