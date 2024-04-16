@@ -68,6 +68,8 @@ public class CoinBlock : MonoBehaviour
         // https://teraphonia.tistory.com/719 자식의 태그
         if (collision.gameObject.CompareTag("Player"))
         {
+            AudioSource source = collision.gameObject.GetComponent<AudioSource>();
+
             foreach (ContactPoint contact in collision.contacts)
             {
                 if (contact.normal.y > 0.9f)
@@ -79,7 +81,7 @@ public class CoinBlock : MonoBehaviour
                         coinPos = new Vector3(transform.position.x, transform.position.y + 1.0f, transform.position.z);
                         coin = Instantiate(coinPrefab, coinPos, Quaternion.identity);
                         if (CoinSoundClip != null)
-                            AudioSource.PlayClipAtPoint(CoinSoundClip, transform.position);
+                            source.PlayOneShot(CoinSoundClip);
                         // 코인 자동 삭제할지 고민, 자동삭제하면 업데이트문 주석처리
                         isCoin = true;
 
@@ -90,7 +92,7 @@ public class CoinBlock : MonoBehaviour
                     else
                     {
                         if (EmptySoundClip != null)
-                            AudioSource.PlayClipAtPoint(EmptySoundClip, transform.position);
+                            source.PlayOneShot(EmptySoundClip);
                         break;
                     }
                 }

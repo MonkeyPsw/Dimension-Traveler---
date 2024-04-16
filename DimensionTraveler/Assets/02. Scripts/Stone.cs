@@ -69,6 +69,7 @@ public class Stone : MonoBehaviour
         if (collision.gameObject.CompareTag("Player"))
         {
             PlayerMovement player = collision.gameObject.GetComponent<PlayerMovement>();
+            AudioSource playerAudio = collision.gameObject.GetComponent<AudioSource>();
             Rigidbody rb = collision.rigidbody;
 
             Debug.Log("µ¹Ãæµ¹");
@@ -84,10 +85,7 @@ public class Stone : MonoBehaviour
 
             direction.Normalize();
 
-            //AudioSource.PlayClipAtPoint(stoneBreakSoundClip, transform.position);
-            audioSource.clip = stoneBreakSoundClip;
-            audioSource.volume = 1.0f;
-            audioSource.Play();
+            playerAudio.PlayOneShot(stoneBreakSoundClip);
 
             rb.AddForce(direction * 8.0f, ForceMode.VelocityChange);
             Destroy(gameObject);
@@ -97,16 +95,14 @@ public class Stone : MonoBehaviour
         {
             if (stoneSoundClip != null && isStone)
             {
-                //AudioSource.PlayClipAtPoint(stoneSoundClip, transform.position);
-                audioSource.clip = stoneSoundClip;
-                audioSource.volume = 0.5f;
-                audioSource.Play();
+                audioSource.PlayOneShot(stoneSoundClip);
                 isStone = false;
             }
         }
 
         if (collision.gameObject.CompareTag("Stone"))
         {
+            audioSource.PlayOneShot(stoneBreakSoundClip);
             Destroy(gameObject);
             Destroy(collision.gameObject);
         }

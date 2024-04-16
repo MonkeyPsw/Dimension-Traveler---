@@ -122,7 +122,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 2
   atk: 2
-  score: 200
+  score: 400
   monsterSoundClip: {fileID: 8300000, guid: 9feba163369caf04e94392566a2dd495, type: 3}
 --- !u!54 &249276897180672534
 Rigidbody:

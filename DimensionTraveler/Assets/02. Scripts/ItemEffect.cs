@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static Unity.VisualScripting.Member;
 
 public class ItemEffect : MonoBehaviour
 {
@@ -24,7 +25,9 @@ public class ItemEffect : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            PlayEffect();
+            AudioSource source = other.GetComponent<AudioSource>();
+
+            PlayEffect(source);
             ItemFunction();
         }
     }
@@ -72,7 +75,7 @@ public class ItemEffect : MonoBehaviour
         Destroy(gameObject);
     }
 
-    private void PlayEffect()
+    private void PlayEffect(AudioSource source)
     {
         if (ItemEffectPrefab != null)
         {
@@ -82,7 +85,7 @@ public class ItemEffect : MonoBehaviour
 
         if (ItemSoundClip != null)
         {
-            AudioSource.PlayClipAtPoint(ItemSoundClip, transform.position);
+            source.PlayOneShot(ItemSoundClip);
         }
     }
 }

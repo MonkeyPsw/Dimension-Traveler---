@@ -58,16 +58,15 @@ public class PlayerMovement : MonoBehaviour
     public AudioClip overDimensionSound;
     bool isFall = false;
     public AudioClip fallSound;
+    float lastFallTime;
+    float fallInterval = 1.5f;
 
     bool isGameOver = false;
 
-    private void Awake()
-    {
-        GameManager.inputEnabled = false;
-    }
-
     void Start()
     {
+        GameManager.inputEnabled = false;
+
         rb = GetComponent<Rigidbody>();
         animator = GetComponentInChildren<Animator>();
         audioSource = GetComponent<AudioSource>();
@@ -97,6 +96,8 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
+        //Debug.Log("ypos : " + transform.position.y);
+        //Debug.Log("velo : " + rb.velocity.magnitude);
         if (curHpText == null)
         {
             TextInit();
@@ -104,7 +105,6 @@ public class PlayerMovement : MonoBehaviour
 
         if (GameManager.inputEnabled)
         {
-            isFall = false;
             if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
             {
                 jumpY = transform.position.y;
@@ -133,21 +133,24 @@ public class PlayerMovement : MonoBehaviour
             gameObject.layer = 7;
 
         // 추락
-        if (!isFall && transform.position.y < -10)
+        // 디버그를 찍어보니 transform.position.y가 -10 이하가 돼도
+        // 그냥 계속 떨어지는 현상이 간혹 발생한다. 이유를 모르겠다. 너무 빨라서 그런가?
+        // 진짜 너무 빨라서 그런거였네.
+        //if (transform.position.y < -12.0f || rb.velocity.magnitude > 13.0f)
+        //{
+        //    transform.position = new Vector3(0, -4.1f, 0);
+        //}
+
+        // 연속 추락은 그냥 로직 순서 문제였구나. 인터벌도 필요하긴했다.
+        if (!isFall && transform.position.y < -10.0f && Time.time - lastFallTime > fallInterval)
         {
-            Debug.Log("추락");
             isFall = true;
-            audioSource.PlayOneShot(fallSound);
-            //transform.position = new Vector3(0, -4.1f, 0);
-            animator.SetTrigger("isDrop");
-            animator.SetFloat("Move", 0);
-            GameManager.instance.AddCurHp(-3);
-            StartCoroutine(InputDelayAndToggleGod(2.0f));
+            lastFallTime = Time.time;
         }
 
-        if (transform.position.y < -10)
+        if (isFall)
         {
-            transform.position = new Vector3(0, -4.1f, 0);
+            PlayerFall();
         }
 
         if (isReduce)
@@ -175,10 +178,30 @@ public class PlayerMovement : MonoBehaviour
         scoreText.text = "SCORE : " + GameManager.instance.GetScore();
     }
 
+    void PlayerFall()
+    {
+        Debug.Log("추락");
+
+        audioSource.PlayOneShot(fallSound);
+        GameManager.instance.AddCurHp(-3);
+
+        animator.SetTrigger("isDrop");
+        animator.SetFloat("Move", 0);
+        StartCoroutine(InputDelayAndToggleGod(2.0f));
+        isFall = false;
+    }
+
     void FixedUpdate()
     {
         float moveHorizontal = Input.GetAxisRaw("Horizontal");
         float moveVertical = Input.GetAxisRaw("Vertical");
+
+        // Rigidbody의 속도가 매우 빠른 경우에는
+        // 한 프레임 동안의 이동 거리가 너무 커서 Update 함수가 호출되지 않을 수 있다. 
+        if (transform.position.y < -12.0f)
+        {
+            transform.position = new Vector3(0, -4.1f, 0);
+        }
 
         CheckIsGrounded();
         // 바닥에 스치기만해도 점프끝남 - Ray수정

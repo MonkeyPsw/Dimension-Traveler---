@@ -31,6 +31,8 @@ public class Block : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Player"))
         {
+            AudioSource source = collision.gameObject.GetComponent<AudioSource>();
+
             foreach (ContactPoint contact in collision.contacts)
             {
                 // Player의 윗면과 Cube의 아랫면이 닿았는지 확인
@@ -38,7 +40,7 @@ public class Block : MonoBehaviour
                 {
                     // Cube를 없애거나 비활성화하거나 원하는 동작 수행
 
-                    NormalBlockBreak();
+                    NormalBlockBreak(source);
 
                     break; // 충돌한 지점 중 하나가 확인되면 반복문을 종료합니다.
                     // 고맙다 CHATGPT
@@ -49,13 +51,13 @@ public class Block : MonoBehaviour
         }
     }
 
-    void NormalBlockBreak()
+    void NormalBlockBreak(AudioSource source)
     {
         Destroy(gameObject);
 
         if (BlockBreakSoundClip != null)
         {
-            AudioSource.PlayClipAtPoint(BlockBreakSoundClip, transform.position);
+            source.PlayOneShot(BlockBreakSoundClip);
         }
 
         GameObject effect = Instantiate(destroyEffect, transform.position, Quaternion.identity);

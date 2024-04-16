@@ -66,6 +66,8 @@ public class ItemBlock : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Player"))
         {
+            AudioSource source = collision.gameObject.GetComponent<AudioSource>();
+            
             foreach (ContactPoint contact in collision.contacts)
             {
                 if (contact.normal.y > 0.9f)
@@ -77,7 +79,7 @@ public class ItemBlock : MonoBehaviour
                         itemPos = new Vector3(transform.position.x, transform.position.y + 1.0f, transform.position.z);
                         item = Instantiate(itemPrefab, itemPos, Quaternion.identity);
                         if (ItemSoundClip != null)
-                            AudioSource.PlayClipAtPoint(ItemSoundClip, transform.position);
+                            source.PlayOneShot(ItemSoundClip);
                         isItem = true;
 
                         gameObject.GetComponentInChildren<Renderer>().material = emptyMaterial;
@@ -87,7 +89,7 @@ public class ItemBlock : MonoBehaviour
                     else
                     {
                         if (EmptySoundClip != null)
-                            AudioSource.PlayClipAtPoint(EmptySoundClip, transform.position);
+                            source.PlayOneShot(EmptySoundClip);
                         break;
                     }
                 }

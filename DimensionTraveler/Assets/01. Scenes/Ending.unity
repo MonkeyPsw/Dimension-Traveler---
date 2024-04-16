@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.6266231, g: 0.8307843, b: 0.8336302, a: 1}
+  m_IndirectSpecularColor: {r: 0.66621685, g: 0.8827709, b: 0.8857476, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -5372,7 +5372,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_FontData:
-    m_Font: {fileID: 12800000, guid: b9f4ab2bab10e8a4e9be1c807699ec1d, type: 3}
+    m_Font: {fileID: 12800000, guid: 9ce47823fbed38b46a78c652195ddab4, type: 3}
     m_FontSize: 80
     m_FontStyle: 1
     m_BestFit: 1
@@ -5453,8 +5453,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: 'Your Score : 00000'
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: b98454283548b204b9a47061bd0140a1, type: 2}
-  m_sharedMaterial: {fileID: 1163913406933948361, guid: b98454283548b204b9a47061bd0140a1, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: b3db9aab4a5a40647a2c0ea651a9254d, type: 2}
+  m_sharedMaterial: {fileID: 2897295218606072828, guid: b3db9aab4a5a40647a2c0ea651a9254d, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []

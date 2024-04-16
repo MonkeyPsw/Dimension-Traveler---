@@ -6,6 +6,7 @@ using UnityEngine.UI;
 public class PressShiftKey : MonoBehaviour
 {
     public Text text;
+    public GameObject tutorialPanel;
     private float alpha = 1.0f;
     private int mode = 0;
 
@@ -39,5 +40,10 @@ public class PressShiftKey : MonoBehaviour
             }
         }
         text.color = new Color(text.color.r, text.color.g, text.color.b, alpha);
+    }
+
+    public void ToggleTutoPanel()
+    {
+        tutorialPanel.SetActive(!tutorialPanel.activeSelf);
     }
 }
